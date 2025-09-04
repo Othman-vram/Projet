@@ -1,0 +1,122 @@
+-->M´ethodologie d’Analyse :
+
+	L’´etude du cahier des charges a ´et´e men´ee selon une approche m´ethodique impliquant
+plusieurs parties prenantes. Cette analyse a combin´e entretiens individuels approfondis,
+observations directes sur site, et ´etude comparative des
+solutions concurrentes.
+
+-->Parties Prenantes consultees :
+
+	1-Physicien Medical
+	1-responsable informatique biomédicale au département d’imagerie
+	1-Spéciliste en anatomopathologie
+
+-->Méthodes d'investigations :
+
+	-->Observations de sessions de travail r´eelles
+	-->Réunions régulières avec les parties prenantes et retours d’expérience
+
+-->Besoins fonctionnels détaillées :
+	(Préciciant : le Projet ce divise en deux partie une pahse de pré-taitement
+	visant a lire les diffirents types de ficher manipulé en anapathologie (SVS,MRXS) et de générer
+        un ficher TIFF pyramidal identique mais avec pr"taitement (qui est la segmentaiton des tissues en enlevant 
+	le background afin de manipuler uniquement le tissu dans l'outil de stuture/Visualisation)
+		
+	-->Prétraitement :
+
+		-->Lectures des Formats : Lecture les fichiers scannés utilisés en anatomopathologie (SVS et MRXS) :Élevée
+		-->Segmentation : conserver uniquement les régions histologiques exploitables pour la phase de reconstitution: Elevé
+
+		-->Génération du TIFF pyramidal : Créer un fichier TIFF pyramidal prétraité et segmenté, identique à l’entrée mais prêt pour la phase de visualisation et de suture : Elevé
+
+		-->Préservation des métadonnées : Conserver les informations importantes liées aux fragments (dimensions, résolution, identifiants) : Moyen
+
+
+	-->Reconstitution et suture manuelle des fragments : 
+
+		-->Chargement TIFF pyramidal : Support complet des fichiers TIFF multi-r´esolution : elevé
+
+		-->Manipulation fragments    : Permettre de déplacer et pivoter manuellement chaque fragment : Élevée
+		
+		-->Alignement / suture rigide : Aligner précisément les fragments adjacents pour former une image complète et cohérente : Elevée
+
+		-->Visualisation interactive : Permettre un zoom, un panoramique et un contrôle visuel précis lors de l’assemblage : Elevée
+
+		-->Exportation : Générer l’image finale en haute résolution pyramidal, prête pour intégration dans le protocole TEP Margins[il faut choir les manulaments les niveau pyramidaux qu'on souhaite exporter] : Elévé
+	
+		-->Points étiquetés pour alignement : Fournir des points ou repères étiquetés sur les fragments afin de permettre un alignement manuel précis lors de la reconstitution : Moyen 
+
+		-->Selection et manipulation de groupes de fragments : Moyen
+
+		-->Syst`eme d’annulation/r´etablissement des op´erations : Moyen
+
+		-->Suppression de fragments importés : Permettre de retirer des fragments inutiles ou erronés de l’espace de travail : Moyen
+
+		-->désactivation de la visibilité : Pouvoir masquer temporairement certains fragments pour faciliter l’assemblage : Moyen
+
+		-->Gestion de l’opacité des fragments : Ajuster l’opacité des fragments afin de mieux visualiser les superpositions et améliorer la précision de la suture :Moyen
+
+		
+
+-->Les Besoins Non fonctinnels :
+
+	Exigences de Performance : 
+
+		-->Utilisation m´emoire : Optimisation pour fonctionner avec 16GB RAM standard
+		-->Scalabilité : Support jusqu’`a 10 fragments simultanement
+		-->Temps de réponse de l'interface: 100 MS pour toute intéractin  utilistuers
+
+
+-->Propositions et Critiques de solutions 
+
+		-->Les solutions exitnates explorer : (BIEN SUR Bien definer le fonctionnement de chaque téchnologie avant de définir les limitations)
+			
+			-->Pythosticher : 
+
+				-->Limitations : Stuture de fragements uniquements avec des couples de 2 ou 4 pas plus 
+				-->Rejet de cette solution
+
+			-->Histosticher : 
+
+				-->Ancien integrer uniqumenet avec matlab 
+				-->Rejet de la Solution 
+				-->Pas de lelcture de SVS / MRXS
+
+			-->AHSLAR : 
+
+				-->Fonctinnel uniquement si les fragments de tissues contiennesnt des zones 
+				de chevauchement qui n'est pas le cas pour notre projet ou le tissue  tumoral
+				est decouper physisquement
+
+				-->Bonne solution mais non utilisable avec nos données
+
+			-->FIJI/IMAGEJ : 
+
+				-->Meme probnleme que ASHLAR 
+				-->Manque de zone d'intéret dans no images pour effectuer une suture
+				-->Rejet de cette solution
+
+			-->Developpement de plugin napari:
+
+				-->Imssible puisque on peut visualiser un seul fragement a la foi 
+				-->Un seul fragement par canva
+				-->Solution Rejeter
+
+
+
+
+	Expliquer clairement quelle approche tu as retenue et pourquoi.
+
+ 	Justifier le choix par rapport aux besoins fonctionnels et aux limites des solutions existantes.
+	
+	[Vue du manque d'outil faisant notre tache on a choisi de develipper un outil personnaliser from scratch]
+	Avantages d´ecisifs :
+	— Performance optimale avec acc`es direct aux ressources syst`eme
+	— Contrˆole total sur l’interface utilisateur et l’exp´erience
+	— S´ecurit´e maximale avec traitement local des donn´ees
+
+
+	Inconv´enients :
+	— Distribution plus complexe n´ecessitant packaging sp´ecialis´e
+	- Temps de developpemnt elevé
+

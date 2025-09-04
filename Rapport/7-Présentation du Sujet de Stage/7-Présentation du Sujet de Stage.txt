@@ -1,0 +1,49 @@
+# Présentation du sujet de stage
+
+Ce stage de spécialité, réalisé au Centre Henri Becquerel dans le département d’anatomopathologie et en lien avec les équipes d’imagerie médicale, s’inscrit dans un projet de recherche clinique ambitieux intitulé **TEP Margins**. L’objectif général de ce projet est d’améliorer l’évaluation des marges chirurgicales en oncologie ORL grâce à l’apport d’outils innovants d’imagerie et d’analyse numérique.
+
+---
+
+## Contexte général
+
+En cancérologie des voies aérodigestives supérieures, la chirurgie constitue aujourd’hui le traitement de référence. Pourtant, le taux de récidive locale reste élevé, compris entre 10 et 45% selon la nature histologique et la localisation de la tumeur. L’un des facteurs pronostiques majeurs est le statut des marges chirurgicales. Une résection dite *complète* nécessite des marges dites *suffisantes*, généralement définies comme étant supérieures à 5 mm du front tumoral. Lorsque les marges sont jugées insuffisantes ou atteintes, le risque de récidive tumorale et de diminution de la survie globale augmente significativement.
+
+Aujourd’hui, l’évaluation peropératoire repose principalement sur l’examen anatomopathologique extemporané. Bien qu’il soit largement pratiqué, cet examen souffre de plusieurs limites : il est invasif, dépend fortement de l’expertise et du jugement subjectif du chirurgien dans le choix des zones analysées, et présente une sensibilité particulièrement faible (environ 10%). De ce fait, dans près d’un cas sur cinq, les marges sont finalement jugées insuffisantes ou envahies après analyse histologique définitive.
+
+---
+
+## Présentation de l’étude TEP Margins
+
+Afin de répondre à cette problématique, l’étude **TEP Margins** explore une approche innovante basée sur la **micro-TEP TDM au 18F-FDG**. Ce dispositif compact, mobile et de très haute résolution (200 µm), autorisé par la FDA et marqué CE, permet de réaliser une imagerie métabolique fine des pièces opératoires *ex vivo* après injection peropératoire du traceur 18F-FDG.
+
+L’objectif principal de l’étude est d’évaluer la performance diagnostique de la micro-TEP TDM dans l’identification des marges chirurgicales atteintes et saines, en comparaison directe avec l’analyse histologique définitive, considérée comme le *gold standard*.
+
+Les objectifs secondaires incluent :
+
+* l’évaluation de la concordance entre marges radiologiques (micro-TEP) et marges histologiques ;
+* l’analyse des discordances observées en cas de marges dites insuffisantes (situées entre 1 et 5 mm) ;
+* la précision du contourage tumoral, évaluée grâce aux indices de similarité de Dice et de Jaccard.
+
+---
+
+## Méthodologie de l’étude
+
+Le protocole prévoit qu’au moment de la chirurgie, la pièce opératoire soit identifiée et marquée conjointement par le chirurgien et l’anatomopathologiste. Elle est ensuite analysée successivement en micro-TEP et en histologie. Chaque axe de coupe est subdivisé en quadrants afin de permettre une correspondance stricte entre les images radiologiques et histologiques. Les marges sont ensuite classées en trois catégories : atteintes, saines ou insuffisantes.
+
+Une étape critique consiste à corriger les effets de rétraction des tissus liés à leur conservation dans le formol. Pour ce faire, un recalage élastique entre les images radiologiques et histologiques est appliqué, garantissant une superposition précise et une comparaison fiable. Les analyses sont réalisées en aveugle par plusieurs experts, renforçant la robustesse scientifique de l’étude.
+
+---
+
+## Sous-ensemble traité pendant le stage
+
+La réussite du protocole dépend fortement de la disponibilité d’images histologiques complètes et de haute qualité. Or, dans la pratique, les lames scannées sont souvent fragmentées et nécessitent une reconstitution numérique avant exploitation.
+
+C’est dans ce contexte que s’inscrit mon stage : le développement d’un **outil logiciel dédié au réarrangement et à la suture rigide de fragments histologiques**. L’application développée permet :
+
+* d’importer des fragments scannés et de les déplacer dans un espace de travail intuitif ;
+* d’orienter et d’assembler correctement les coupes tissulaires ;
+* de générer et d’exporter une image finale en haute définition, prête à être intégrée dans le protocole TEP Margins.
+
+---
+
+

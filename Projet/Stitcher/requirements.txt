@@ -1,0 +1,11 @@
+-->Lecture du RAQ : 1
+-->Lecture du PMP : 1
+-->Lecture de la documentation existante : 2
+-->Installation du système d’exploitation Ubuntu : 2
+-->Test du réseau existant : 2
+-->Création des comptes Google Aegis : 2
+-->Définition et planification des jalons : 3
+-->Familiarisation avec la code base : 5
+-->Lancement de l’assistant sur chaque machine : 5
+
+Total Story Points : 23 SP

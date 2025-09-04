@@ -1,0 +1,17 @@
+1. Phase de prétraitement
+
+Cette étape consiste à utiliser QuPath pour la lecture des images numériques (formats SVS, MRXS).
+
+Un plugin de QuPath appelé Segment Anything Model (SAM) permet d’exploiter les outils de sélection natifs de QuPath afin de délimiter la zone de tissu à segmenter.
+
+Le masque correspondant est ensuite exporté au format GeoJSON.
+
+Une pipeline prend en entrée l’image originale (SVS ou MRXS) ainsi que le fichier GeoJSON, et génère en sortie une image TIFF pyramidale contenant uniquement le tissu extrait. Cette étape permet d’éliminer le fond indésirable et de produire une image au format RGBA.
+
+2. Phase de suture
+
+Les fragments obtenus sont importés dans l’outil desktop.
+
+L’utilisateur peut alors aligner et assembler manuellement ces fragments.
+
+Enfin, les fragments suturés sont exportés au format TIFF pyramidal, avec la possibilité de sélectionner le niveau de détail souhaité.

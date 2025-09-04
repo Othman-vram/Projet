@@ -1,0 +1,7 @@
+This report presents the work carried out during my 13-week specialization internship at the Centre Henri Becquerel. The internship focused on the creation and implementation of a tool for generating high-definition anatomic pathology images from scanned slides. The main objective was the development of a professional tool for rearranging and rigidly aligning tissue fragments, addressing the specific needs of medical imaging laboratories for reconstructing fragmented histological images.
+
+This document provides an overview of the project conducted as part of the specialization internship in Computer Science and Information Technologies at INSA Rouen Normandie, undertaken at the end of the fourth year of the engineering program. The work carried out aims to provide an effective tool for pathology laboratories to improve the quality and reliability of images obtained from fragmented slides.
+
+The application developed allows users to manually move and rearrange histological fragments within a workspace, orient them correctly, and then export the final image in high definition. It thus facilitates the digital reconstruction of scanned slides, reduces the complexity of manual handling, and provides practical support to physicians and researchers in their analyses.
+
+Ultimately, this project falls within a dynamic of technological innovation serving medical imaging, offering a solution adapted to the current challenges of digital anatomic pathology.

@@ -1,0 +1,13 @@
+Dans le domaine médical, et plus particulièrement en anatomopathologie, l’analyse des lames histologiques constitue une étape essentielle pour l’établissement de diagnostics fiables. Avec l’essor de l’imagerie numérique, de nouvelles approches émergent afin d’améliorer la visualisation, la conservation et le traitement de ces échantillons. Cependant, les images issues des lames scannées peuvent parfois être fragmentées, rendant leur exploitation plus complexe et nécessitant des outils adaptés pour en faciliter la reconstruction.
+
+C’est dans ce contexte que le Centre Henri Becquerel a initié le développement d’un outil informatique dédié au réarrangement et à l’assemblage rigide de fragments tissulaires. L’objectif principal est de proposer une solution pratique permettant aux utilisateurs de manipuler manuellement ces fragments, de les replacer dans la bonne orientation et d’exporter l’image finale en haute définition. Ce type d’outil répond à un besoin concret des laboratoires d’imagerie médicale, en apportant un gain de précision et une meilleure lisibilité des lames numériques.
+
+Au cours de mon stage de spécialité de 13 semaines en Informatique et Technologies de l’Information à l’INSA Rouen Normandie, j’ai contribué à la conception et à l’implémentation de ce projet innovant. Mon travail s’est articulé autour du développement des fonctionnalités principales de l’application et de la mise en place d’une interface adaptée aux besoins des utilisateurs.
+
+Ce rapport est organisé en quatre chapitres :
+— Le premier présente le contexte général, les motivations et les objectifs du projet.
+— Le deuxième expose l’analyse des besoins fonctionnels et techniques, ainsi que les choix de conception.
+— Le troisième détaille l’architecture logicielle et les technologies utilisées.
+— Enfin, le quatrième décrit la mise en œuvre pratique, les fonctionnalités réalisées et les résultats obtenus.
+
+Cette organisation permet de suivre pas à pas le déroulement du projet et de mettre en valeur la contribution apportée par ce travail à la modernisation des pratiques en anapathologie numérique.

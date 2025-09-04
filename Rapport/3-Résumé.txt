@@ -1,0 +1,12 @@
+Résumé : 
+
+Ce rapport présente le travail accompli au cours de mon stage de spécialité d’une durée de 13 semaines réalisé au sein du Centre Henri Becquerel. Ce stage a porté sur la création et la mise en œuvre d’un outil de génération d’images d’anapathologie en haute définition à partir de lames scannées. L’objectif principal était le développement d’un outil professionnel de réarrangement et de suture rigide de fragments tissulaires, répondant aux besoins spécifiques des laboratoires d’imagerie médicale dans la reconstruction d’images histologiques fragmentées.
+
+
+Ce document propose un aperçu du projet mené dans le cadre du stage de spécialité en Informatique et Technologies de l’Information à l’INSA Rouen Normandie, effectué à la fin de la quatrième année du cycle ingénieur. Le travail réalisé s’inscrit dans une démarche visant à fournir aux laboratoires d’anapathologie un outil efficace pour améliorer la qualité et la fiabilité des images obtenues à partir de lames fragmentées.
+
+L’application développée permet de déplacer et réarranger manuellement les fragments histologiques dans un espace de travail, de les orienter correctement puis d’exporter l’image finale en haute définition. Elle facilite ainsi la reconstitution numérique des lames scannées, réduit la complexité des manipulations et offre un support pratique aux médecins et chercheurs pour leurs analyses.
+
+
+En définitive, ce projet s’inscrit dans une dynamique d’innovation technologique au service de l’imagerie médicale, en proposant une solution adaptée aux enjeux actuels de l’anapathologie numérique.
+

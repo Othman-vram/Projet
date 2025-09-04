@@ -1,0 +1,68 @@
+## Table des matières
+
+1. Présentation de l'entreprise et du contexte
+   1.1 Le Centre Henri-Becquerel
+   1.2 L'équipe QuantIF
+   1.3 Thèmes et axes de recherche
+   1.4 Principales contributions et publications
+   1.5 Composition de l'équipe et plateau technique
+
+---
+
+## 1. Présentation de l'entreprise et du contexte
+
+### 1.1 Le Centre Henri-Becquerel
+
+Le Centre Henri-Becquerel est un Centre de Lutte Contre le Cancer (CLCC) situé à Rouen, en France. Faisant partie du réseau national Unicancer, il assure une triple mission de soins, de recherche et d'enseignement. Il prend en charge la majorité des pathologies cancéreuses et dispose d'un plateau technique intégré comprenant la radiothérapie, la médecine nucléaire et la radiologie. Le Centre est également labellisé « OECI » par l'Association Européenne des Centres Anti-Cancer.
+
+### 1.2 L'équipe QuantIF
+
+L'équipe « Quantification en Imagerie médicale Fonctionnelle » (QuantIF), rattachée au LITIS EA 4108, est une équipe de recherche pluridisciplinaire au sein du Centre Henri-Becquerel. Elle se concentre sur les problématiques d'imagerie médicale, en ciblant les pathologies tumorales et inflammatoires, principalement au niveau du thorax et de l'abdomen-pelvis.
+
+### 1.3 Thèmes et axes de recherche
+
+Les recherches de l'équipe QuantIF se basent sur plusieurs modalités d'imagerie :
+
+* Le couplage Tomographie par Émission de Positons / TomoDensito Métrie (TEP/TDM)
+* L’imagerie microendoscopique confocale fibrée (imagerie en fluorescence)
+* L’Imagerie par Résonance Magnétique (IRM)
+
+De ces modalités découlent trois questions médicales d’intérêt :
+
+* L’amélioration du ciblage et de la balistique du cancer pulmonaire en radiothérapie grâce à l’imagerie fonctionnelle TEP/TDM (responsabilité : Pr Vera)
+* La caractérisation de l’alvéole pulmonaire grâce aux nouvelles techniques d’imagerie microendoscopique confocale (responsabilité : Pr Thiberville)
+* La caractérisation du foie et du tube digestif en IRM (responsabilité : Pr Savoye-Collet)
+
+Les verrous en traitement d’images sont la classification et la sélection de caractéristiques. Les travaux portent également sur l’amélioration des données quantitatives des images, leur segmentation et la fusion d’informations.
+
+### 1.4 Principales contributions et publications
+
+Les principales contributions de l'équipe sont :
+
+* Adaptation des "fonctions de croyance" à la segmentation des tumeurs thoraciques et du volume rénal
+* Optimisation des mesures de volumes en TEP-TDM pour la définition du "Gross Tumour Volume" (GTV)
+* Développement et analyse des images de microscopie confocale *in vivo* du poumon
+* Fusion d’imageries multifonctionnelles en TEP-TDM
+* Optimisation de l’imagerie synchronisée (TEMP cardiaque, TEP-TDM pulmonaire)
+
+L’équipe a également publié plusieurs articles majeurs :
+
+1. Thureau S. et al. *Interobserver agreement of qualitative analysis and tumor delineation of FMISO and FLT PET-images in lung cancer.* J Nucl Med. 2013 Sept.
+2. Vera P. et al. *FDG-PET during radiochemotherapy is predictive of outcome at 1 year in non small cell lung cancer patients: a prospective multicentric study (RTEP2).* Eur J Nucl Med Mol Imaging. 2014 Jun.
+3. Salaün M. et al. *In vivo probe-confocal laser endomicroscopy in amiodarone-related pneumonia.* European Respiratory Journal, 2013.
+4. Mi H. et al. *Prediction of Lung Tumor Evolution During Radiotherapy in Individual Patients with PET.* IEEE Transaction on Medical Imaging, 2014.
+5. Desir C. et al. *Classification of endomicroscopic images of the lung based on random subwindows and extra-trees.* IEEE Trans Biomed Eng. 2012 Sep.
+
+### 1.5 Composition de l'équipe et plateau technique
+
+L’équipe est composée de 15 membres permanents et de 7 doctorants :
+
+* **4 PU-PH** : B. DUBRAY, L. THIBERVILLE, P. VERA, C. SAVOYE-COLLET
+* **1 PU** : S. RUAN
+* **2 MCU-PH** : JF. MENARD, M. SALAÜN
+* **2 MdC** : C. PETITJEAN, J. LAPUYADE
+* **6 PH** : S. BECKER, A. EDET-SANSON, I. GARDIN, S. HAPDEY, P. BOHN, R. MODZELEWSKI
+* **1 Ingénieur** : R. MODZELEWSKI
+
+Pour ses travaux, l’équipe dispose des équipements suivants : une plateforme d’imagerie du petit animal, un laboratoire de traitement d’image, ainsi que l’accès aux équipements d’imagerie des CHU et CHB (IRM, TDM, TEP-TDM, etc.) et au service de radiothérapie du CHB.
+

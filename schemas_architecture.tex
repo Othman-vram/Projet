@@ -1,0 +1,319 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{xcolor}
+
+\geometry{margin=2cm}
+
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{calc}
+\usetikzlibrary{shadows}
+
+% Définition des couleurs
+\definecolor{inputcolor}{RGB}{52, 152, 219}
+\definecolor{processcolor}{RGB}{46, 204, 113}
+\definecolor{outputcolor}{RGB}{231, 76, 60}
+\definecolor{toolcolor}{RGB}{155, 89, 182}
+\definecolor{datacolor}{RGB}{241, 196, 15}
+
+% Styles pour les boîtes
+\tikzstyle{input} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=inputcolor, fill=inputcolor!20, thick]
+\tikzstyle{process} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=processcolor, fill=processcolor!20, thick]
+\tikzstyle{output} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=outputcolor, fill=outputcolor!20, thick]
+\tikzstyle{tool} = [rectangle, rounded corners, minimum width=2.5cm, minimum height=0.8cm, text centered, draw=toolcolor, fill=toolcolor!20, thick]
+\tikzstyle{data} = [ellipse, minimum width=2.5cm, minimum height=1cm, text centered, draw=datacolor, fill=datacolor!20, thick]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{dasharrow} = [thick,->,>=stealth,dashed]
+
+\begin{document}
+
+\title{Schémas d'Architecture - Pipeline de Traitement d'Images Histologiques}
+\author{EL IDRISSI Othman}
+\date{\today}
+\maketitle
+
+\section{Architecture de la Phase de Prétraitement}
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=2cm]
+
+% Titre du schéma
+\node[above] at (0,8) {\Large \textbf{Pipeline de Prétraitement des Images Histologiques}};
+
+% Entrées
+\node (svs) [input] at (-6,6) {Image SVS/MRXS\\(Lame scannée)};
+\node (qupath) [tool] at (-2,6) {QuPath\\+ Plugin SAM};
+
+% Processus de segmentation
+\node (selection) [process] at (2,6) {Sélection\\Zones de Tissu};
+\node (geojson) [data] at (6,6) {Masque\\GeoJSON};
+
+% Pipeline Python
+\node (pipeline) [process] at (0,3.5) {Pipeline Python\\unified\_tissue\_pipeline.py};
+
+% Sous-processus du pipeline
+\node (conversion) [process] at (-4,1.5) {Conversion\\SVS → TIFF};
+\node (maskgen) [process] at (0,1.5) {Génération\\Masque Pyramidal};
+\node (extraction) [process] at (4,1.5) {Extraction\\Tissus RGBA};
+
+% Sortie finale
+\node (tiffout) [output] at (0,-1) {TIFF Pyramidal\\RGBA Prétraité};
+
+% Flèches principales
+\draw [arrow] (svs) -- (qupath);
+\draw [arrow] (qupath) -- (selection);
+\draw [arrow] (selection) -- (geojson);
+
+% Flèches vers le pipeline
+\draw [arrow] (svs) -- (-3,4.5) -- (-1.5,3.5);
+\draw [arrow] (geojson) -- (3,4.5) -- (1.5,3.5);
+
+% Flèches du pipeline
+\draw [arrow] (pipeline) -- (conversion);
+\draw [arrow] (pipeline) -- (maskgen);
+\draw [arrow] (pipeline) -- (extraction);
+
+% Flèches entre sous-processus
+\draw [arrow] (conversion) -- (maskgen);
+\draw [arrow] (maskgen) -- (extraction);
+
+% Flèche finale
+\draw [arrow] (extraction) -- (tiffout);
+
+% Annotations
+\node[text width=3cm, align=center] at (-8,3) {\small \textit{Formats supportés:\\SVS, MRXS, TIFF}};
+\node[text width=3cm, align=center] at (8,3) {\small \textit{Segmentation\\automatique\\avec SAM}};
+\node[text width=4cm, align=center] at (6,-1) {\small \textit{Fond transparent\\Tissus préservés\\Multi-résolution}};
+
+% Cadre pour le pipeline
+\draw[dashed, thick, processcolor] (-5.5,0.5) rectangle (5.5,2.5);
+\node[processcolor] at (0,2.8) {\textbf{Étapes du Pipeline Unifié}};
+
+\end{tikzpicture}
+\caption{Architecture de la phase de prétraitement}
+\end{figure}
+
+\newpage
+
+\section{Architecture de la Phase de Suture}
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=2cm]
+
+% Titre du schéma
+\node[above] at (0,9) {\Large \textbf{Architecture de l'Application de Suture Manuelle}};
+
+% Entrée
+\node (tiffinput) [input] at (0,7.5) {Fragments TIFF\\Pyramidaux Prétraités};
+
+% Couche de chargement
+\node (loader) [process] at (0,6) {Image Loader\\(OpenSlide + tifffile)};
+
+% Architecture MVC
+\node (mvc) [above] at (0,4.8) {\textbf{Architecture MVC (PyQt6)}};
+
+% Modèle
+\node (fragmanager) [process] at (-4,4) {Fragment\\Manager};
+\node (pointmanager) [process] at (-4,2.5) {Point\\Manager};
+
+% Vue
+\node (mainwindow) [process] at (0,4) {Main Window};
+\node (canvas) [process] at (0,2.5) {Canvas Widget\\(Visualisation)};
+\node (controls) [process] at (0,1) {Control Panel\\(Manipulation)};
+
+% Contrôleur
+\node (algorithms) [process] at (4,4) {Algorithmes\\de Suture};
+\node (exporters) [process] at (4,2.5) {Export\\Manager};
+
+% Fonctionnalités principales
+\node (features) [above] at (0,-0.5) {\textbf{Fonctionnalités Principales}};
+
+\node (manipulation) [tool] at (-3,-1.5) {Manipulation\\Fragments};
+\node (alignment) [tool] at (0,-1.5) {Alignement\\Manuel};
+\node (stitching) [tool] at (3,-1.5) {Suture\\Rigide};
+
+% Sortie
+\node (finaloutput) [output] at (0,-3.5) {Image Finale\\TIFF Pyramidal\\Haute Définition};
+
+% Flèches principales
+\draw [arrow] (tiffinput) -- (loader);
+\draw [arrow] (loader) -- (fragmanager);
+\draw [arrow] (loader) -- (mainwindow);
+
+% Flèches MVC
+\draw [arrow] (fragmanager) -- (mainwindow);
+\draw [arrow] (pointmanager) -- (mainwindow);
+\draw [arrow] (mainwindow) -- (canvas);
+\draw [arrow] (mainwindow) -- (controls);
+\draw [arrow] (canvas) -- (algorithms);
+\draw [arrow] (controls) -- (algorithms);
+\draw [arrow] (algorithms) -- (exporters);
+
+% Flèches bidirectionnelles pour l'interaction
+\draw [dasharrow] (canvas) -- (fragmanager);
+\draw [dasharrow] (controls) -- (fragmanager);
+\draw [dasharrow] (canvas) -- (pointmanager);
+
+% Flèches vers fonctionnalités
+\draw [arrow] (canvas) -- (manipulation);
+\draw [arrow] (canvas) -- (alignment);
+\draw [arrow] (algorithms) -- (stitching);
+
+% Flèche finale
+\draw [arrow] (exporters) -- (finaloutput);
+
+% Annotations techniques
+\node[text width=2.5cm, align=center] at (-6.5,3) {\small \textit{Gestion état\\fragments\\transformations}};
+\node[text width=2.5cm, align=center] at (6.5,3) {\small \textit{SIFT features\\Optimisation\\L-BFGS-B}};
+\node[text width=3cm, align=center] at (6,-3.5) {\small \textit{Multi-niveaux\\Compression LZW\\Métadonnées}};
+
+% Cadres pour grouper les composants
+\draw[dashed, thick, processcolor] (-5,1.5) rectangle (-3,4.5);
+\node[processcolor] at (-4,4.8) {\textbf{Modèle}};
+
+\draw[dashed, thick, toolcolor] (-1,0.5) rectangle (1,4.5);
+\node[toolcolor] at (0,4.8) {\textbf{Vue}};
+
+\draw[dashed, thick, outputcolor] (3,1.5) rectangle (5,4.5);
+\node[outputcolor] at (4,4.8) {\textbf{Contrôleur}};
+
+\end{tikzpicture}
+\caption{Architecture de l'application de suture manuelle}
+\end{figure}
+
+\newpage
+
+\section{Flux de Données Global}
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=1.5cm]
+
+% Titre
+\node[above] at (0,8) {\Large \textbf{Flux de Données Global du Système}};
+
+% Phase 1 - Acquisition
+\node (microscope) [input] at (-6,6) {Microscope\\Scanner};
+\node (rawimage) [data] at (-3,6) {Image Brute\\SVS/MRXS};
+
+% Phase 2 - Prétraitement
+\node (preprocessing) [process] at (0,6) {Prétraitement\\Pipeline};
+\node (fragments) [data] at (3,6) {Fragments\\TIFF RGBA};
+
+% Phase 3 - Suture
+\node (stitching) [process] at (0,3) {Application\\Suture};
+\node (finalimage) [output] at (3,3) {Image Finale\\Reconstituée};
+
+% Phase 4 - Utilisation
+\node (analysis) [tool] at (0,0) {Analyse\\TEP Margins};
+\node (diagnosis) [output] at (3,0) {Diagnostic\\Médical};
+
+% Flèches principales
+\draw [arrow] (microscope) -- (rawimage);
+\draw [arrow] (rawimage) -- (preprocessing);
+\draw [arrow] (preprocessing) -- (fragments);
+\draw [arrow] (fragments) -- (stitching);
+\draw [arrow] (stitching) -- (finalimage);
+\draw [arrow] (finalimage) -- (analysis);
+\draw [arrow] (analysis) -- (diagnosis);
+
+% Annotations de phases
+\node[text width=2cm, align=center] at (-6,4.5) {\small \textbf{Phase 1}\\Acquisition};
+\node[text width=2cm, align=center] at (0,4.5) {\small \textbf{Phase 2}\\Prétraitement};
+\node[text width=2cm, align=center] at (0,1.5) {\small \textbf{Phase 3}\\Suture};
+\node[text width=2cm, align=center] at (0,-1.5) {\small \textbf{Phase 4}\\Application};
+
+% Détails techniques
+\node[text width=3cm, align=center] at (-6,7.5) {\tiny \textit{Résolution:\\0.25 µm/pixel\\Format propriétaire}};
+\node[text width=3cm, align=center] at (6,6) {\tiny \textit{Fond transparent\\Multi-résolution\\Optimisé}};
+\node[text width=3cm, align=center] at (6,3) {\tiny \textit{Haute définition\\Métadonnées\\Exportable}};
+\node[text width=3cm, align=center] at (6,0) {\tiny \textit{Marges chirurgicales\\Micro-TEP\\Corrélation}};
+
+\end{tikzpicture}
+\caption{Flux de données global du système}
+\end{figure}
+
+\section{Diagramme de Classes Simplifié}
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[node distance=2cm]
+
+% Titre
+\node[above] at (0,7) {\Large \textbf{Diagramme de Classes Principal}};
+
+% Classes principales
+\node (fragment) [process, text width=3cm] at (-4,5) {
+    \textbf{Fragment}\\
+    \rule{3cm}{0.4pt}\\
+    - id: str\\
+    - image\_data: ndarray\\
+    - x, y: float\\
+    - rotation: float\\
+    - visible: bool\\
+    \rule{3cm}{0.4pt}\\
+    + get\_transformed\_image()\\
+    + contains\_point()
+};
+
+\node (fragmanager) [process, text width=3cm] at (0,5) {
+    \textbf{FragmentManager}\\
+    \rule{3cm}{0.4pt}\\
+    - fragments: Dict\\
+    - selected\_id: str\\
+    \rule{3cm}{0.4pt}\\
+    + add\_fragment()\\
+    + rotate\_fragment()\\
+    + translate\_fragment()
+};
+
+\node (canvas) [process, text width=3cm] at (4,5) {
+    \textbf{CanvasWidget}\\
+    \rule{3cm}{0.4pt}\\
+    - zoom: float\\
+    - pan\_x, pan\_y: float\\
+    - fragments: List\\
+    \rule{3cm}{0.4pt}\\
+    + paintEvent()\\
+    + mousePressEvent()
+};
+
+\node (imageloader) [process, text width=3cm] at (-4,2) {
+    \textbf{ImageLoader}\\
+    \rule{3cm}{0.4pt}\\
+    - supported\_formats\\
+    \rule{3cm}{0.4pt}\\
+    + load\_image()\\
+    + get\_pyramid\_info()
+};
+
+\node (exporter) [process, text width=3cm] at (4,2) {
+    \textbf{PyramidalExporter}\\
+    \rule{3cm}{0.4pt}\\
+    \rule{3cm}{0.4pt}\\
+    + export\_pyramidal\_tiff()\\
+    + create\_level\_composite()
+};
+
+% Relations
+\draw [arrow] (fragmanager) -- (fragment);
+\draw [arrow] (canvas) -- (fragmanager);
+\draw [arrow] (imageloader) -- (fragment);
+\draw [arrow] (exporter) -- (fragmanager);
+
+% Labels des relations
+\node at (-2,5.3) {\tiny manages};
+\node at (2,5.3) {\tiny displays};
+\node at (-4,3.5) {\tiny creates};
+\node at (4,3.5) {\tiny exports};
+
+\end{tikzpicture}
+\caption{Diagramme de classes simplifié}
+\end{figure}
+
+\end{document}

@@ -1,0 +1,410 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+% Packages pour la mise en page
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usepackage{fontawesome5}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{fancyvrb}
+
+% Configuration de l'espacement
+\setstretch{1.2}
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+
+% Définition des couleurs
+\definecolor{PrimaryBlue}{RGB}{41, 128, 185}
+\definecolor{SecondaryBlue}{RGB}{52, 152, 219}
+\definecolor{AccentGreen}{RGB}{39, 174, 96}
+\definecolor{WarningOrange}{RGB}{230, 126, 34}
+\definecolor{DarkGray}{RGB}{44, 62, 80}
+\definecolor{LightGray}{RGB}{236, 240, 241}
+\definecolor{CodeBg}{RGB}{248, 249, 250}
+
+% Configuration des boîtes
+\tcbuselibrary{skins,breakable}
+
+% Style pour les sections principales
+\newtcolorbox{sectionbox}[2]{
+    colback=#1!5,
+    colframe=#1,
+    title={\Large\bfseries #2},
+    fonttitle=\color{white},
+    coltitle=white,
+    rounded corners=8pt,
+    drop shadow,
+    breakable,
+    enhanced,
+    left=15pt,
+    right=15pt,
+    top=15pt,
+    bottom=15pt,
+    attach boxed title to top center={yshift=-3mm},
+    boxed title style={rounded corners=5pt}
+}
+
+% Style pour les sous-sections
+\newtcolorbox{subsectionbox}[2]{
+    colback=#1!10,
+    colframe=#1,
+    title={\large\bfseries #2},
+    rounded corners=5pt,
+    breakable,
+    enhanced,
+    left=10pt,
+    right=10pt,
+    top=10pt,
+    bottom=10pt
+}
+
+% Configuration du code
+\lstset{
+    backgroundcolor=\color{CodeBg},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    captionpos=b,
+    commentstyle=\color{AccentGreen},
+    keywordstyle=\color{PrimaryBlue}\bfseries,
+    stringstyle=\color{WarningOrange},
+    frame=single,
+    rulecolor=\color{LightGray},
+    numbers=left,
+    numberstyle=\tiny\color{DarkGray},
+    showstringspaces=false,
+    tabsize=2
+}
+
+\title{\Huge\textbf{Solution Technique Développée\\pour la Suture d'Images Histologiques}}
+\author{\Large Conception et Implémentation}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\textit{\large Du concept à la réalisation : architecture et développement}
+\end{center}
+
+\vspace{1cm}
+
+\tableofcontents
+
+\newpage
+
+\section{Contexte de Développement}
+
+Face à l'absence de solutions existantes répondant aux contraintes spécifiques du projet TEP Margins, nous avons entrepris le développement d'un outil sur mesure. Cette décision, bien que représentant un investissement en temps considérable, s'est révélée être la seule approche viable pour répondre aux besoins identifiés.
+
+\begin{sectionbox}{PrimaryBlue}{Architecture Générale de la Solution}
+
+\subsection{Vision d'Ensemble}
+
+Notre solution se compose de deux modules complémentaires, chacun répondant à une phase spécifique du workflow d'analyse histologique :
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Module de Prétraitement} : Pipeline automatisé de segmentation et d'extraction tissulaire
+    \item \textbf{Module de Suture Interactive} : Interface graphique pour l'assemblage manuel des fragments
+\end{enumerate}
+
+Cette architecture modulaire permet une séparation claire des responsabilités tout en maintenant une cohérence dans le traitement des données.
+
+\subsection{Flux de Données Global}
+
+\begin{center}
+\begin{tikzpicture}[node distance=2.5cm, auto]
+    % Définition des styles
+    \tikzstyle{process} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=PrimaryBlue, fill=PrimaryBlue!20, thick]
+    \tikzstyle{data} = [ellipse, minimum width=2.5cm, minimum height=0.8cm, text centered, draw=AccentGreen, fill=AccentGreen!20, thick]
+    \tikzstyle{arrow} = [thick,->,>=stealth, color=DarkGray]
+    
+    % Nœuds
+    \node (input) [data] {Images SVS/MRXS};
+    \node (preprocess) [process, below of=input] {Prétraitement\\Segmentation};
+    \node (fragments) [data, below of=preprocess] {Fragments TIFF\\Pyramidaux};
+    \node (stitching) [process, below of=fragments] {Interface\\de Suture};
+    \node (output) [data, below of=stitching] {Image Finale\\Reconstituée};
+    
+    % Flèches
+    \draw [arrow] (input) -- (preprocess);
+    \draw [arrow] (preprocess) -- (fragments);
+    \draw [arrow] (fragments) -- (stitching);
+    \draw [arrow] (stitching) -- (output);
+    
+    % Annotations
+    \node [right of=preprocess, node distance=4cm, text width=3cm] {\small\textit{Extraction automatique du tissu avec fond transparent}};
+    \node [right of=stitching, node distance=4cm, text width=3cm] {\small\textit{Assemblage manuel avec outils d'aide à l'alignement}};
+\end{tikzpicture}
+\end{center}
+
+\end{sectionbox}
+
+\section{Module de Prétraitement}
+
+\begin{subsectionbox}{SecondaryBlue}{Pipeline d'Extraction Tissulaire}
+
+Le module de prétraitement constitue la première étape critique de notre workflow. Il transforme les images brutes d'anatomopathologie en fragments exploitables pour la phase de suture.
+
+\textbf{Étapes du Pipeline :}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Lecture Multi-Format} : Support natif des formats SVS, MRXS et TIFF pyramidal
+    \item \textbf{Segmentation Guidée} : Utilisation de QuPath avec le plugin SAM pour délimiter les zones d'intérêt
+    \item \textbf{Extraction RGBA} : Génération d'images avec fond transparent préservant uniquement le tissu
+    \item \textbf{Optimisation Pyramidale} : Création de structures multi-résolution pour une navigation fluide
+\end{enumerate}
+
+\textbf{Innovation Technique :}
+
+L'approche adoptée combine l'expertise médicale (segmentation manuelle guidée) avec l'automatisation informatique (pipeline de traitement). Cette hybridation garantit une précision maximale tout en maintenant une efficacité opérationnelle.
+
+\end{subsectionbox}
+
+\begin{subsectionbox}{AccentGreen}{Intégration QuPath et SAM}
+
+L'utilisation de QuPath enrichi du plugin Segment Anything Model (SAM) représente un choix technologique stratégique. Cette combinaison offre :
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Précision de Segmentation} : SAM permet une délimitation fine des contours tissulaires
+    \item \textbf{Interface Familière} : QuPath est déjà maîtrisé par les équipes d'anatomopathologie
+    \item \textbf{Flexibilité} : Possibilité d'ajustements manuels selon l'expertise médicale
+    \item \textbf{Reproductibilité} : Export standardisé au format GeoJSON
+\end{itemize}
+
+\end{subsectionbox}
+
+\section{Module de Suture Interactive}
+
+\begin{sectionbox}{PrimaryBlue}{Architecture Logicielle}
+
+\subsection{Choix Technologiques Fondamentaux}
+
+Le développement de l'interface de suture s'appuie sur un stack technologique moderne et robuste :
+
+\begin{center}
+\begin{tabular}{|l|l|p{6cm}|}
+\hline
+\rowcolor{LightGray}
+\textbf{Composant} & \textbf{Technologie} & \textbf{Justification} \\
+\hline
+Framework GUI & PyQt6 & Interface native, performance optimale, outils avancés \\
+\hline
+Traitement d'images & OpenCV + NumPy & Algorithmes éprouvés, performance, flexibilité \\
+\hline
+Formats médicaux & OpenSlide + tifffile & Support natif SVS/MRXS, gestion pyramidale \\
+\hline
+Visualisation & OpenGL via Qt & Rendu accéléré, zoom fluide, grandes images \\
+\hline
+Architecture & MVC modulaire & Séparation des responsabilités, maintenabilité \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Architecture MVC Adaptée}
+
+L'application suit une architecture Modèle-Vue-Contrôleur adaptée aux spécificités de la manipulation d'images médicales :
+
+\textbf{Modèle (Model)} :
+\begin{itemize}[leftmargin=*]
+    \item \texttt{FragmentManager} : Gestion centralisée des fragments et de leurs transformations
+    \item \texttt{PointManager} : Système de points étiquetés pour l'alignement précis
+    \item \texttt{Fragment} : Encapsulation des données et métadonnées de chaque fragment
+\end{itemize}
+
+\textbf{Vue (View)} :
+\begin{itemize}[leftmargin=*]
+    \item \texttt{CanvasWidget} : Zone de visualisation principale avec rendu optimisé
+    \item \texttt{FragmentListWidget} : Liste interactive des fragments chargés
+    \item \texttt{ControlPanel} : Panneaux de contrôle pour les transformations
+\end{itemize}
+
+\textbf{Contrôleur (Controller)} :
+\begin{itemize}[leftmargin=*]
+    \item \texttt{MainWindow} : Orchestration générale et gestion des événements
+    \item \texttt{ExportManager} : Gestion des exports multi-formats
+    \item \texttt{RigidStitchingAlgorithm} : Algorithmes d'aide à l'alignement
+\end{itemize}
+
+\end{sectionbox}
+
+\begin{subsectionbox}{SecondaryBlue}{Fonctionnalités Clés Implémentées}
+
+\textbf{1. Manipulation Interactive des Fragments}
+
+L'interface permet une manipulation intuitive des fragments avec plusieurs modes d'interaction :
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Déplacement libre} : Glisser-déposer avec retour visuel immédiat
+    \item \textbf{Rotation précise} : Rotation par pas de 90° ou angle libre
+    \item \textbf{Retournement} : Miroir horizontal et vertical
+    \item \textbf{Sélection multiple} : Manipulation de groupes de fragments
+\end{itemize}
+
+\textbf{2. Système de Points Étiquetés}
+
+Innovation majeure de notre solution, ce système permet :
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Placement précis} : Ajout de points de référence sur les fragments
+    \item \textbf{Correspondances} : Association de points avec étiquettes identiques
+    \item \textbf{Alignement assisté} : Calcul automatique des transformations optimales
+    \item \textbf{Validation visuelle} : Affichage des correspondances en temps réel
+\end{itemize}
+
+\textbf{3. Export Multi-Format Avancé}
+
+Le système d'export répond aux besoins variés des utilisateurs :
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{PNG rapide} : Pour prévisualisations et présentations
+    \item \textbf{TIFF pyramidal} : Préservation de la structure multi-résolution
+    \item \textbf{Sélection de niveaux} : Contrôle précis des résolutions exportées
+    \item \textbf{Métadonnées} : Export JSON pour reproductibilité
+\end{itemize}
+
+\end{subsectionbox}
+
+\section{Défis Techniques Relevés}
+
+\begin{subsectionbox}{WarningOrange}{Gestion de la Performance}
+
+Le traitement d'images histologiques haute résolution pose des défis significatifs :
+
+\textbf{Problématiques identifiées :}
+\begin{itemize}[leftmargin=*]
+    \item Images de plusieurs gigaoctets par fragment
+    \item Rendu temps réel lors des manipulations
+    \item Consommation mémoire lors du zoom
+    \item Fluidité de l'interface utilisateur
+\end{itemize}
+
+\textbf{Solutions implémentées :}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Rendu par niveaux} : Adaptation automatique de la résolution selon le zoom
+    \item \textbf{Cache intelligent} : Mise en cache des transformations coûteuses
+    \item \textbf{Rendu asynchrone} : Séparation des calculs et de l'affichage
+    \item \textbf{Optimisation mémoire} : Libération automatique des ressources inutilisées
+\end{itemize}
+
+\end{subsectionbox}
+
+\begin{subsectionbox}{AccentGreen}{Innovation dans l'Alignement}
+
+L'absence de zones de chevauchement dans nos images a nécessité le développement d'approches innovantes :
+
+\textbf{Approche Hybride Développée :}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Alignement Manuel Guidé} : Interface intuitive pour positionnement approximatif
+    \item \textbf{Points de Correspondance} : Système de points étiquetés pour précision
+    \item \textbf{Optimisation Automatique} : Algorithmes de raffinement basés sur les contraintes utilisateur
+    \item \textbf{Validation Visuelle} : Retour immédiat sur la qualité de l'alignement
+\end{enumerate}
+
+Cette approche combine l'expertise médicale de l'utilisateur avec la précision algorithmique, créant un workflow optimal pour notre contexte spécifique.
+
+\end{subsectionbox}
+
+\section{Exemple d'Implémentation}
+
+\begin{subsectionbox}{DarkGray}{Code Représentatif : Gestion des Transformations}
+
+Voici un extrait du code illustrant la gestion des transformations de fragments :
+
+\begin{lstlisting}[language=Python, caption=Gestion des transformations dans FragmentManager]
+class FragmentManager(QObject):
+    """Gestionnaire central des fragments et transformations"""
+    
+    fragments_changed = pyqtSignal()
+    
+    def rotate_group(self, fragment_ids: List[str], angle: int):
+        """Rotation d'un groupe de fragments autour de leur centre"""
+        fragments = [self._fragments[fid] for fid in fragment_ids 
+                    if fid in self._fragments]
+        
+        if not fragments:
+            return
+        
+        # Calcul du centre géométrique du groupe
+        center_x = sum(f.x for f in fragments) / len(fragments)
+        center_y = sum(f.y for f in fragments) / len(fragments)
+        
+        # Application de la rotation à chaque fragment
+        angle_rad = math.radians(angle)
+        cos_a, sin_a = math.cos(angle_rad), math.sin(angle_rad)
+        
+        for fragment in fragments:
+            # Rotation de la position
+            rel_x = fragment.x - center_x
+            rel_y = fragment.y - center_y
+            
+            new_rel_x = rel_x * cos_a - rel_y * sin_a
+            new_rel_y = rel_x * sin_a + rel_y * cos_a
+            
+            fragment.x = center_x + new_rel_x
+            fragment.y = center_y + new_rel_y
+            
+            # Rotation du fragment lui-même
+            fragment.rotation = (fragment.rotation + angle) % 360.0
+            fragment.invalidate_cache()
+        
+        self.fragments_changed.emit()
+\end{lstlisting}
+
+\end{subsectionbox}
+
+\section{Validation et Tests}
+
+\begin{subsectionbox}{AccentGreen}{Stratégie de Validation}
+
+La validation de notre solution s'articule autour de plusieurs axes :
+
+\textbf{Tests Techniques :}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Performance} : Mesure des temps de réponse sur différentes tailles d'images
+    \item \textbf{Stabilité} : Tests de charge avec multiples fragments simultanés
+    \item \textbf{Précision} : Validation de la précision des transformations géométriques
+    \item \textbf{Compatibilité} : Tests sur différents formats et résolutions d'images
+\end{itemize}
+
+\textbf{Validation Utilisateur :}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Ergonomie} : Évaluation de l'interface par les utilisateurs finaux
+    \item \textbf{Workflow} : Intégration dans le processus existant du laboratoire
+    \item \textbf{Formation} : Facilité d'apprentissage et d'adoption
+    \item \textbf{Fiabilité} : Reproductibilité des résultats entre utilisateurs
+\end{itemize}
+
+\end{subsectionbox}
+
+\section{Perspectives d'Évolution}
+
+Notre solution, bien que fonctionnelle, ouvre plusieurs pistes d'amélioration future :
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Intelligence Artificielle} : Intégration d'algorithmes de reconnaissance de formes pour l'alignement automatique
+    \item \textbf{Collaboration} : Fonctionnalités de travail collaboratif multi-utilisateurs
+    \item \textbf{Cloud} : Déploiement en mode SaaS pour faciliter l'accès
+    \item \textbf{Intégration} : API pour connexion avec les systèmes LIMS existants
+\end{enumerate}
+
+\vspace{1cm}
+
+\begin{center}
+\textit{Cette solution technique représente une réponse sur mesure aux défis spécifiques\\du projet TEP Margins, alliant innovation technologique et pragmatisme opérationnel.}
+\end{center}
+
+\end{document}

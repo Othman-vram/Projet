@@ -154,6 +154,43 @@ Cette architecture modulaire permet une séparation claire des responsabilités 
 
 \section{Module de Prétraitement}
 
+% Schéma d'architecture de la phase de prétraitement
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=2.5cm, every node/.style={scale=0.8}]
+
+% Ligne 1 - Entrées
+\node (svs) [input] at (0,6) {Image\\SVS/MRXS};
+\node (qupath) [tool] at (5,6) {QuPath\\+ SAM};
+\node (geojson) [data] at (10,6) {Masque\\GeoJSON};
+
+% Ligne 2 - Pipeline
+\node (pipeline) [process] at (5,4) {Pipeline Python\\unified\_tissue\_pipeline.py};
+
+% Ligne 3 - Processus
+\node (conversion) [process] at (0,2) {Conversion\\SVS → TIFF};
+\node (maskgen) [process] at (5,2) {Génération\\Masque};
+\node (extraction) [process] at (10,2) {Extraction\\RGBA};
+
+% Ligne 4 - Sortie
+\node (tiffout) [output] at (5,0) {TIFF Pyramidal\\RGBA Prétraité};
+
+% Flèches
+\draw [arrow] (svs) -- (qupath);
+\draw [arrow] (qupath) -- (geojson);
+\draw [arrow] (svs) -- (pipeline);
+\draw [arrow] (geojson) -- (pipeline);
+\draw [arrow] (pipeline) -- (conversion);
+\draw [arrow] (pipeline) -- (maskgen);
+\draw [arrow] (pipeline) -- (extraction);
+\draw [arrow] (conversion) -- (maskgen);
+\draw [arrow] (maskgen) -- (extraction);
+\draw [arrow] (extraction) -- (tiffout);
+
+\end{tikzpicture}
+\caption{Architecture de la phase de prétraitement}
+\end{figure}
+
 \begin{subsectionbox}{SecondaryBlue}{Pipeline d'Extraction Tissulaire}
 
 Le module de prétraitement constitue la première étape critique de notre workflow. Il transforme les images brutes d'anatomopathologie en fragments exploitables pour la phase de suture.
@@ -188,7 +225,92 @@ L'utilisation de QuPath enrichi du plugin Segment Anything Model (SAM) représen
 
 \section{Module de Suture Interactive}
 
+% Schéma d'architecture de la phase de suture
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=2.5cm, every node/.style={scale=0.8}]
+
+% Entrée
+\node (input) [input] at (5,8) {Fragments TIFF\\Pyramidaux};
+
+% Chargement
+\node (loader) [process] at (5,6.5) {Image Loader\\OpenSlide + tifffile};
+
+% Couche Modèle
+\node (fragmgr) [process] at (0,5) {Fragment\\Manager};
+\node (pointmgr) [process] at (0,3) {Point\\Manager};
+
+% Couche Vue
+\node (mainwin) [process] at (5,5) {Main\\Window};
+\node (canvas) [process] at (5,3) {Canvas\\Widget};
+
+% Couche Contrôleur
+\node (algo) [process] at (10,5) {Algorithmes\\Suture};
+\node (export) [process] at (10,3) {Export\\Manager};
+
+% Sortie
+\node (output) [output] at (5,1) {Image Finale\\TIFF Pyramidal};
+
+% Flèches
+\draw [arrow] (input) -- (loader);
+\draw [arrow] (loader) -- (mainwin);
+\draw [arrow] (fragmgr) -- (mainwin);
+\draw [arrow] (pointmgr) -- (mainwin);
+\draw [arrow] (mainwin) -- (canvas);
+\draw [arrow] (algo) -- (mainwin);
+\draw [arrow] (export) -- (mainwin);
+\draw [arrow] (export) -- (output);
+
+% Labels des couches
+\node[processcolor, font=\small\bfseries] at (0,5.8) {Modèle};
+\node[toolcolor, font=\small\bfseries] at (5,5.8) {Vue};
+\node[outputcolor, font=\small\bfseries] at (10,5.8) {Contrôleur};
+
+\end{tikzpicture}
+\caption{Architecture de l'application de suture}
+\end{figure}
+
 \begin{sectionbox}{PrimaryBlue}{Architecture Logicielle}
+
+% Flux de données global
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=3cm, every node/.style={scale=0.9}]
+
+% Phase 1
+\node (micro) [input] at (0,6) {Microscope\\Scanner};
+\node (raw) [data] at (4,6) {Image Brute\\SVS/MRXS};
+
+% Phase 2
+\node (preproc) [process] at (8,6) {Prétraitement\\Pipeline};
+\node (frags) [data] at (12,6) {Fragments\\TIFF RGBA};
+
+% Phase 3
+\node (app) [process] at (8,3) {Application\\Suture};
+\node (final) [output] at (12,3) {Image Finale\\Reconstituée};
+
+% Phase 4
+\node (analysis) [tool] at (8,0) {Analyse\\TEP Margins};
+\node (diag) [output] at (12,0) {Diagnostic\\Médical};
+
+% Flèches
+\draw [arrow] (micro) -- (raw);
+\draw [arrow] (raw) -- (preproc);
+\draw [arrow] (preproc) -- (frags);
+\draw [arrow] (frags) -- (app);
+\draw [arrow] (app) -- (final);
+\draw [arrow] (final) -- (analysis);
+\draw [arrow] (analysis) -- (diag);
+
+% Labels des phases
+\node[font=\small\bfseries, text width=2cm, align=center] at (0,2) {Phase 1\\Acquisition};
+\node[font=\small\bfseries, text width=2cm, align=center] at (4,2) {Phase 2\\Prétraitement};
+\node[font=\small\bfseries, text width=2cm, align=center] at (8,2) {Phase 3\\Suture};
+\node[font=\small\bfseries, text width=2cm, align=center] at (12,2) {Phase 4\\Application};
+
+\end{tikzpicture}
+\caption{Flux de données global du système}
+\end{figure}
 
 \subsection{Choix Technologiques Fondamentaux}
 
@@ -239,6 +361,79 @@ L'application suit une architecture Modèle-Vue-Contrôleur adaptée aux spécif
 \end{itemize}
 
 \end{sectionbox}
+
+% Diagramme de classes simplifié
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[node distance=3cm, every node/.style={scale=0.7}]
+
+% Classes principales
+\node (fragment) [process, text width=3cm] at (0,4) {
+    \textbf{Fragment}\\
+    \rule{3cm}{0.4pt}\\
+    - id: str\\
+    - image\_data\\
+    - x, y: float\\
+    - rotation: float\\
+    \rule{3cm}{0.4pt}\\
+    + get\_transformed()\\
+    + contains\_point()
+};
+
+\node (fragmgr) [process, text width=3cm] at (5,4) {
+    \textbf{FragmentManager}\\
+    \rule{3cm}{0.4pt}\\
+    - fragments: Dict\\
+    - selected\_id: str\\
+    \rule{3cm}{0.4pt}\\
+    + add\_fragment()\\
+    + rotate\_fragment()\\
+    + translate\_fragment()
+};
+
+\node (canvas) [process, text width=3cm] at (10,4) {
+    \textbf{CanvasWidget}\\
+    \rule{3cm}{0.4pt}\\
+    - zoom: float\\
+    - pan\_x, pan\_y\\
+    - fragments: List\\
+    \rule{3cm}{0.4pt}\\
+    + paintEvent()\\
+    + mousePressEvent()
+};
+
+\node (loader) [process, text width=3cm] at (0,0) {
+    \textbf{ImageLoader}\\
+    \rule{3cm}{0.4pt}\\
+    - supported\_formats\\
+    \rule{3cm}{0.4pt}\\
+    + load\_image()\\
+    + get\_pyramid\_info()
+};
+
+\node (exporter) [process, text width=3cm] at (10,0) {
+    \textbf{PyramidalExporter}\\
+    \rule{3cm}{0.4pt}\\
+    \rule{3cm}{0.4pt}\\
+    + export\_pyramidal()\\
+    + create\_composite()
+};
+
+% Relations
+\draw [arrow] (fragmgr) -- (fragment);
+\draw [arrow] (canvas) -- (fragmgr);
+\draw [arrow] (loader) -- (fragment);
+\draw [arrow] (exporter) -- (fragmgr);
+
+% Labels des relations
+\node[font=\tiny] at (2.5,4.3) {manages};
+\node[font=\tiny] at (7.5,4.3) {displays};
+\node[font=\tiny] at (0,2) {creates};
+\node[font=\tiny] at (7.5,2) {exports};
+
+\end{tikzpicture}
+\caption{Diagramme de classes simplifié}
+\end{figure}
 
 \begin{subsectionbox}{SecondaryBlue}{Fonctionnalités Clés Implémentées}
 

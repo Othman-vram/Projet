@@ -2,6 +2,50 @@
 \usepackage[utf8]{inputenc}
 \documentclass[12pt,a4paper]{report}
 \usepackage{charte_graphique_INSA/classeRapport}
+
+% Packages pour améliorer le style
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{colortbl}
+
+% Définition des couleurs pour les titres
+\definecolor{ChapterColor}{RGB}{0, 51, 102}      % Bleu foncé INSA
+\definecolor{SectionColor}{RGB}{74, 144, 226}    % Bleu moyen
+\definecolor{SubsectionColor}{RGB}{52, 152, 219} % Bleu clair
+\definecolor{SubsubsectionColor}{RGB}{155, 89, 182} % Violet
+\definecolor{TableHeaderColor}{RGB}{230, 240, 250} % Bleu très clair pour tableaux
+
+% Configuration des titres avec couleurs
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries\color{ChapterColor}}
+{\chaptertitlename\ \thechapter}{20pt}{\Huge\color{ChapterColor}}
+
+\titleformat{\section}
+{\normalfont\Large\bfseries\color{SectionColor}}
+{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\normalfont\large\bfseries\color{SubsectionColor}}
+{\thesubsection}{1em}{}
+
+\titleformat{\subsubsection}
+{\normalfont\normalsize\bfseries\color{SubsubsectionColor}}
+{\thesubsubsection}{1em}{}
+
+% Espacement amélioré
+\setstretch{1.2}
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+
+% Forcer les chapitres sur nouvelle page
+\let\oldchapter\chapter
+\renewcommand{\chapter}{\clearpage\oldchapter}
+
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amsfonts}
@@ -22,7 +66,7 @@
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,positioning,calc}
 
-% Configuration du code
+% Définition des couleurs pour TikZ
 \lstset{
     basicstyle=\ttfamily\footnotesize,
     breaklines=true,
@@ -189,6 +233,70 @@ C'est dans ce contexte que s'inscrit mon stage : le développement d'un \textbf{
 
 \chapter{Travail effectué}
 
+\section{Définitions des termes techniques}
+
+Cette section présente les définitions de tous les termes techniques utilisés dans ce rapport.
+
+\begin{longtable}{|p{4cm}|p{10cm}|}
+\hline
+\rowcolor{TableHeaderColor}
+\textbf{Terme} & \textbf{Définition} \\
+\hline
+\endhead
+
+Anatomopathologie & Spécialité médicale qui étudie les lésions macroscopiques et microscopiques des organes et tissus prélevés sur le patient \\
+\hline
+
+Format SVS & Format propriétaire développé par Aperio (Leica Biosystems) pour stocker des images de lames entières avec structure pyramidale \\
+\hline
+
+Format MRXS & Format propriétaire de 3DHistech pour leurs scanners Pannoramic, stockant les images dans une structure de fichiers multiples \\
+\hline
+
+TIFF Pyramidal & Extension du format TIFF qui stocke multiple résolutions de la même image dans un seul fichier \\
+\hline
+
+OpenSlide & Bibliothèque C/C++ avec bindings Python pour lire les formats d'images pyramidales de différents constructeurs \\
+\hline
+
+QuPath & Plateforme open-source d'analyse d'images biomédicales développée par l'Université d'Édimbourg \\
+\hline
+
+SAM (Segment Anything Model) & Modèle d'IA développé par Meta AI utilisant des transformers pour la segmentation automatique d'objets \\
+\hline
+
+GeoJSON & Format standard pour les données géospatiales permettant de stocker des géométries complexes \\
+\hline
+
+PyVIPS & Interface Python pour VIPS (Vision Image Processing System), optimisée pour les images de très grande taille \\
+\hline
+
+PyQt6 & Bibliothèque Python fournissant des bindings pour le framework Qt6 de développement d'interfaces graphiques \\
+\hline
+
+Pattern MVC & Architecture logicielle séparant les données (Model), la présentation (View) et la logique (Controller) \\
+\hline
+
+LOD (Level of Detail) & Technique d'optimisation utilisant différentes résolutions selon la distance d'observation \\
+\hline
+
+Alpha Blending & Technique de composition d'images utilisant un canal alpha pour définir la transparence \\
+\hline
+
+SIFT & Scale-Invariant Feature Transform, algorithme de détection de points d'intérêt robustes \\
+\hline
+
+Suture Rigide & Processus d'alignement préservant forme et proportions avec translations et rotations uniquement \\
+\hline
+
+Culling Frustum & Technique d'optimisation évitant de rendre les objets hors du champ de vision \\
+\hline
+
+Cache Multi-niveaux & Système de stockage temporaire à plusieurs niveaux (GPU, mémoire, disque) \\
+\hline
+
+\end{longtable}
+
 \section{Étude du cahier des charges}
 
 \subsection{Méthodologie d'analyse}
@@ -197,12 +305,24 @@ L'étude du cahier des charges a été menée selon une approche méthodique imp
 
 \subsubsection{Parties prenantes consultées}
 
-L'analyse des besoins a impliqué trois acteurs clés :
-\begin{itemize}
-\item Un physicien médical, expert en imagerie médicale et traitement d'images
-\item Un responsable informatique biomédicale au département d'imagerie
-\item Un spécialiste en anatomopathologie, utilisateur final des outils de visualisation
-\end{itemize}
+L'analyse des besoins a impliqué trois acteurs clés présentés dans le tableau suivant :
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{4cm}|p{8cm}|p{3cm}|}
+\hline
+\rowcolor{TableHeaderColor}
+\textbf{Acteur} & \textbf{Expertise} & \textbf{Rôle} \\
+\hline
+Physicien médical & Expert en imagerie médicale et traitement d'images & Tuteur technique \\
+\hline
+Responsable informatique biomédicale & Département d'imagerie, systèmes d'information & Conseil technique \\
+\hline
+Spécialiste anatomopathologie & Utilisateur final des outils de visualisation & Validation besoins \\
+\hline
+\end{tabular}
+\caption{Parties prenantes consultées}
+\end{table}
 
 \subsubsection{Méthodes d'investigation}
 
@@ -215,57 +335,126 @@ La collecte des besoins s'est appuyée sur :
 
 \subsection{Besoins fonctionnels détaillés}
 
-Le projet se divise en deux phases principales : une phase de prétraitement visant à lire les différents types de fichiers manipulés en anatomopathologie (SVS, MRXS) et de générer un fichier TIFF pyramidal identique mais avec prétraitement (segmentation des tissus en enlevant le background afin de manipuler uniquement le tissu dans l'outil de suture/visualisation).
+Le projet se divise en deux phases principales présentées dans les tableaux suivants :
 
 \subsubsection{Phase de prétraitement}
 
-\textbf{Lecture des formats} (Priorité : Élevée) : La capacité de lire les fichiers scannés utilisés en anatomopathologie (SVS et MRXS) constitue un prérequis fondamental. Ces formats propriétaires nécessitent des bibliothèques spécialisées pour l'extraction des données d'image multi-résolution.
+\begin{longtable}{|p{3.5cm}|p{1.5cm}|p{9cm}|}
+\hline
+\rowcolor{TableHeaderColor}
+\textbf{Fonctionnalité} & \textbf{Priorité} & \textbf{Description} \\
+\hline
+\endhead
 
-\textbf{Segmentation} (Priorité : Élevée) : Conserver uniquement les régions histologiques exploitables pour la phase de reconstitution. Cette étape implique l'utilisation d'algorithmes de segmentation automatique ou semi-automatique pour éliminer le fond et les artefacts.
+Lecture des formats & Élevée & Capacité de lire les fichiers SVS et MRXS avec bibliothèques spécialisées pour extraction multi-résolution \\
+\hline
 
-\textbf{Génération du TIFF pyramidal} (Priorité : Élevée) : Créer un fichier TIFF pyramidal prétraité et segmenté, identique à l'entrée mais prêt pour la phase de visualisation et de suture. Cette transformation préserve la structure multi-résolution tout en optimisant les données pour la manipulation interactive.
+Segmentation & Élevée & Conserver uniquement les régions histologiques exploitables, éliminer fond et artefacts \\
+\hline
 
-\textbf{Préservation des métadonnées} (Priorité : Moyenne) : Conserver les informations importantes liées aux fragments (dimensions, résolution, identifiants) pour assurer la traçabilité et la cohérence des données.
+Génération TIFF pyramidal & Élevée & Créer fichier TIFF prétraité et segmenté, préservant structure multi-résolution \\
+\hline
+
+Préservation métadonnées & Moyenne & Conserver informations importantes (dimensions, résolution, identifiants) \\
+\hline
+
+\caption{Besoins fonctionnels - Phase de prétraitement}
+\end{longtable}
 
 \subsubsection{Phase de reconstitution et suture manuelle}
 
-\textbf{Chargement TIFF pyramidal} (Priorité : Élevée) : Support complet des fichiers TIFF multi-résolution avec gestion optimisée de la mémoire et des performances d'affichage.
+\begin{longtable}{|p{3.5cm}|p{1.5cm}|p{9cm}|}
+\hline
+\rowcolor{TableHeaderColor}
+\textbf{Fonctionnalité} & \textbf{Priorité} & \textbf{Description} \\
+\hline
+\endhead
 
-\textbf{Manipulation des fragments} (Priorité : Élevée) : Permettre de déplacer et pivoter manuellement chaque fragment avec une précision sub-pixellique. Cette fonctionnalité nécessite une interface utilisateur intuitive et réactive.
+Chargement TIFF pyramidal & Élevée & Support complet fichiers TIFF multi-résolution avec gestion optimisée mémoire \\
+\hline
 
-\textbf{Alignement/suture rigide} (Priorité : Élevée) : Aligner précisément les fragments adjacents pour former une image complète et cohérente. Cette opération peut être assistée par des algorithmes de détection de caractéristiques ou réalisée entièrement manuellement.
+Manipulation fragments & Élevée & Déplacer et pivoter manuellement chaque fragment avec précision sub-pixellique \\
+\hline
 
-\textbf{Visualisation interactive} (Priorité : Élevée) : Permettre un zoom, un panoramique et un contrôle visuel précis lors de l'assemblage. L'interface doit supporter des niveaux de zoom élevés tout en maintenant des performances acceptables.
+Alignement/suture rigide & Élevée & Aligner précisément fragments adjacents, assisté par algorithmes ou manuel \\
+\hline
 
-\textbf{Exportation} (Priorité : Élevée) : Générer l'image finale en haute résolution pyramidale, prête pour intégration dans le protocole TEP Margins. L'utilisateur doit pouvoir choisir manuellement les niveaux pyramidaux qu'il souhaite exporter.
+Visualisation interactive & Élevée & Zoom, panoramique et contrôle visuel précis avec performances élevées \\
+\hline
 
-\textbf{Points étiquetés pour alignement} (Priorité : Moyenne) : Fournir des points ou repères étiquetés sur les fragments afin de permettre un alignement manuel précis lors de la reconstitution.
+Exportation & Élevée & Générer image finale haute résolution avec sélection niveaux pyramidaux \\
+\hline
 
-\textbf{Sélection et manipulation de groupes de fragments} (Priorité : Moyenne) : Permettre la sélection multiple et la manipulation simultanée de plusieurs fragments pour accélérer le processus d'assemblage.
+Points étiquetés & Moyenne & Points/repères étiquetés pour alignement manuel précis \\
+\hline
 
-\textbf{Système d'annulation/rétablissement des opérations} (Priorité : Moyenne) : Implémenter un historique des actions pour permettre l'annulation et le rétablissement des modifications.
+Sélection groupes & Moyenne & Sélection multiple et manipulation simultanée de plusieurs fragments \\
+\hline
 
-\textbf{Suppression de fragments importés} (Priorité : Moyenne) : Permettre de retirer des fragments inutiles ou erronés de l'espace de travail.
+Annulation/rétablissement & Moyenne & Historique des actions pour annulation et rétablissement \\
+\hline
 
-\textbf{Désactivation de la visibilité} (Priorité : Moyenne) : Pouvoir masquer temporairement certains fragments pour faciliter l'assemblage.
+Suppression fragments & Moyenne & Retirer fragments inutiles ou erronés de l'espace de travail \\
+\hline
 
-\textbf{Gestion de l'opacité des fragments} (Priorité : Moyenne) : Ajuster l'opacité des fragments afin de mieux visualiser les superpositions et améliorer la précision de la suture.
+Désactivation visibilité & Moyenne & Masquer temporairement certains fragments \\
+\hline
+
+Gestion opacité & Moyenne & Ajuster opacité pour visualiser superpositions \\
+\hline
+
+\caption{Besoins fonctionnels - Phase de reconstitution}
+\end{longtable}
 
 \subsection{Besoins non fonctionnels}
 
-\subsubsection{Exigences de performance}
-
-\textbf{Utilisation mémoire} : Optimisation pour fonctionner avec 16 GB de RAM standard, en gérant efficacement le chargement et la mise en cache des images haute résolution.
-
-\textbf{Scalabilité} : Support jusqu'à 10 fragments simultanément sans dégradation significative des performances.
-
-\textbf{Temps de réponse de l'interface} : Maintenir un temps de réponse inférieur à 100 ms pour toute interaction utilisateur, garantissant une expérience fluide.
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{4cm}|p{3cm}|p{7cm}|}
+\hline
+\rowcolor{TableHeaderColor}
+\textbf{Exigence} & \textbf{Valeur cible} & \textbf{Description} \\
+\hline
+Utilisation mémoire & 16 GB max & Optimisation pour RAM standard avec gestion cache images haute résolution \\
+\hline
+Scalabilité & 10 fragments & Support simultané sans dégradation performances \\
+\hline
+Temps de réponse & < 100 ms & Maintenir réactivité pour toute interaction utilisateur \\
+\hline
+Compatibilité OS & Windows/Linux & Support systèmes d'exploitation principaux \\
+\hline
+Résolution max & 50 000 × 50 000 & Support images très haute résolution \\
+\hline
+\end{tabular}
+\caption{Besoins non fonctionnels}
+\end{table}
 
 \section{Propositions et critiques de solutions}
 
 \subsection{Solutions existantes explorées}
 
-L'analyse de l'état de l'art a révélé plusieurs solutions existantes, chacune présentant des limitations spécifiques par rapport à nos besoins.
+L'analyse de l'état de l'art a révélé plusieurs solutions existantes, résumées dans le tableau suivant :
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|p{3cm}|}
+\hline
+\rowcolor{TableHeaderColor}
+\textbf{Solution} & \textbf{Avantages} & \textbf{Limitations} & \textbf{Décision} \\
+\hline
+PyThostitcher & Algorithmes SIFT robustes & Max 2-4 fragments & Rejetée \\
+\hline
+HistoStitcher & Interface MATLAB & Obsolète, pas SVS/MRXS & Rejetée \\
+\hline
+ASHLAR & Algorithmes sophistiqués & Nécessite chevauchement & Rejetée \\
+\hline
+FIJI/ImageJ & Écosystème riche & Pas de chevauchement & Rejetée \\
+\hline
+Plugin Napari & Plateforme moderne & Un fragment par canvas & Rejetée \\
+\hline
+\end{tabular}
+\caption{Analyse comparative des solutions existantes}
+\end{table}
 
 \subsubsection{PyThostitcher}
 
@@ -337,6 +526,8 @@ Face aux limitations des solutions existantes, nous avons opté pour le dévelop
 \end{itemize}
 
 \section{Description complète de la solution retenue}
+
+\clearpage
 
 \subsection{Architecture générale du système}
 
@@ -920,6 +1111,8 @@ def export_pyramidal_tiff(self, fragments: List[Fragment],
 
 \section{Résultats obtenus et analyse critique}
 
+\clearpage
+
 \subsection{Fonctionnalités réalisées et validation}
 
 \subsubsection{Pipeline de prétraitement}
@@ -1080,6 +1273,8 @@ Le travail réalisé contribue à l'avancement des pratiques en anatomopathologi
 
 \section{Mise en œuvre technique et organisationnelle}
 
+\clearpage
+
 \subsection{Environnement de développement}
 
 \subsubsection{Outils et technologies}
@@ -1226,6 +1421,8 @@ Maintenir la précision des transformations géométriques avec des coordonnées
 
 \chapter{Développement Durable et Responsabilité Sociétale}
 
+\clearpage
+
 \section{Impact environnemental}
 
 Le développement de cet outil s'inscrit dans une démarche de responsabilité environnementale à plusieurs niveaux. Premièrement, la numérisation et le traitement informatique des lames histologiques contribuent à réduire l'utilisation de ressources physiques traditionnellement nécessaires à l'analyse anatomopathologique. En permettant une manipulation entièrement numérique des échantillons, l'outil réduit le besoin de manipulations physiques répétées des lames, limitant ainsi les risques de dégradation et la nécessité de nouvelles préparations.
@@ -1247,6 +1444,8 @@ Le développement de l'outil a intégré des considérations éthiques important
 La transparence des algorithmes utilisés constitue un autre aspect éthique important. Contrairement aux solutions basées sur l'intelligence artificielle "boîte noire", l'outil développé utilise des transformations géométriques explicites et vérifiables, permettant aux utilisateurs de comprendre et de valider chaque étape du processus de reconstitution.
 
 \chapter{Conclusion}
+
+\clearpage
 
 \section{Bilan du stage}
 

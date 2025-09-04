@@ -1,0 +1,157 @@
+%%%%%
+% Classe pour réaliser des rapports aux couleurs de l'INSA V3.0
+%%%%%
+
+%%%%%
+% Auteur initial inconnu.
+% Modifié, vectorisé et actualisé par Jean-Baptiste Louvet
+% Adaptations par Yves Le Guennec
+% Mise à jour à la charte graphique 2023, par Alexis Imbert et Kévin Laurent
+%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tgpagella}
+\usepackage{graphicx}
+\usepackage[left=2cm, right=2cm, top=2cm, bottom=4.5cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tcolorbox}
+\usepackage{lastpage}
+\usepackage{eso-pic}
+\usepackage{ifthen}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setlength{\headheight}{33.351pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\definecolor{GRIS}{cmyk}{0.7,0.6,0.5,0.3}
+\definecolor{BLEU}{cmyk}{1,0.9,0.1,0}
+\definecolor{BLANC}{rgb}{1, 1, 1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancyplain}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newenvironment{resume}[1]{%
+  \setlength{\parindent}{0pt}% Supprimer l'indentation
+  \begin{centering}% Aligner le texte à gauche
+  \textbf{\textit{ {#1} }}\\% Afficher le titre en gras et italique
+  \end{centering}%
+  \begin{flushleft}% Aligner le texte à gauche
+  \vspace{0.5cm}% Ajouter un espace entre le titre et le texte
+  \end{flushleft}%
+}{%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\chaptermark}[1]{%
+  \ifthenelse{\value{chapter} > 0}  % Check if chapter number is greater than 0
+  {%  
+    \markboth{\chaptername \ \thechapter\ . #1}{}%  % Display chapter number and title for chapters > 0
+  }{%  
+    \markboth{#1}{}%  % Display only title for chapter 0
+  }%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\hypersetup
+{
+ %%   Liens
+ colorlinks=true,
+ linkcolor=black,
+ filecolor=blue,      
+ urlcolor=blue
+}
+\definecolor{GRIS}{cmyk}{0.7,0.6,0.5,0.3}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\PageDeGarde}[5]
+{
+    \thispagestyle{empty}
+    \AddToShipoutPictureBG*{\includegraphics[width=\paperwidth,height=\paperheight]{charte_graphique_INSA/couverture_simple_generic.pdf}}
+    \begin{picture}(0,0)% Logo INSA
+        \put(-35,-40){
+            \includegraphics[width=0.58\textwidth]{charte_graphique_INSA/INSALogo.pdf}
+        }
+        \put(280,-40){ %Logo de l'entreprise
+            \includegraphics[width=0.48\textwidth]{images/#1.png}
+        }
+        \put(-42,-125){ % Pour le titre du document
+                \begin{minipage}{0.62\textwidth}
+                    \raggedright
+                    \LARGE
+                    \textbf{#2} \\
+                    \large
+                    \raggedleft
+                    \textbf{#3}
+                \end{minipage}
+        }
+        \put(-42,-400){ % Pour les auteurs
+                \color{GRIS}
+                \begin{minipage}
+                    {6.8cm} \large \raggedright #4
+                \end{minipage}
+        }
+        \put(200,-685){
+            \color{GRIS}{
+                %%   Texte en bas a droite : en gris	et en grand
+                \begin{minipage}{20cm}
+                    \raggedright \large #5
+                \end{minipage}
+            }
+        }
+    \end{picture}
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Page}[2]
+{
+    % Header
+    
+    \fancyhead[L]{
+    \begin{picture}(0,0)
+    \put(-30,0)
+    {
+        \includegraphics[height=1.5cm]{charte_graphique_INSA/#1}
+    }
+    \end{picture}
+    }
+    \fancyhead[C]{
+    \begin{picture}(0,0)
+    \put(-80,0)
+    {
+        \includegraphics[height=1.5cm]{images/#2}
+    }
+    \end{picture}
+    }
+    \fancyhead[R]{
+    \begin{flushright}
+        \leftmark
+    \end{flushright}
+    }
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+
+    % Footer
+    \fancyfootoffset{0pt}
+    \fancyfoot[L,C]{}
+    \fancyfoot[R]
+    {
+    \begin{picture}(0,0)
+    % Pour mettre le numéro de page centré dans l'image en bas à droite
+    \put(-25,-60)
+    {
+        \includegraphics[scale=1]{charte_graphique_INSA/foot-logo-pfe.png}
+    }
+    \put(8, -46)
+      {
+      \begin{minipage}{12mm}
+        \centering
+         \color{BLANC}{\thepage/\pageref*{LastPage}}
+      \end{minipage}
+      }
+    \end{picture}
+    }%
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

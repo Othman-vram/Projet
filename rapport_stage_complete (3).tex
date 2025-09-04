@@ -1,15 +1,11 @@
 \documentclass[12pt,a4paper]{report}
 \usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[french]{babel}
-\usepackage{geometry}
+\documentclass[12pt,a4paper]{report}
+\usepackage{charte_graphique_INSA/classeRapport}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{amssymb}
-\usepackage{fancyhdr}
-\usepackage{titlesec}
-\usepackage{tocloft}
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
@@ -24,31 +20,7 @@
 \usepackage{url}
 \usepackage{cite}
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows,positioning}
-
-% Configuration de la page
-\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
-
-% Configuration des en-têtes et pieds de page
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[L]{\leftmark}
-\fancyhead[R]{\thepage}
-\renewcommand{\headrulewidth}{0.4pt}
-
-% Configuration des titres
-\titleformat{\chapter}[display]
-{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
-\titlespacing*{\chapter}{0pt}{-30pt}{40pt}
-
-% Configuration des liens
-\hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    filecolor=magenta,      
-    urlcolor=blue,
-    citecolor=red,
-}
+\usetikzlibrary{shapes,arrows,positioning,calc}
 
 % Configuration du code
 \lstset{
@@ -79,49 +51,11 @@
 
 \begin{document}
 
-% Page de garde
-\begin{titlepage}
-\centering
-\vspace*{1cm}
+% Page de garde INSA
+\PageDeGarde{CHB_logo}{Création et Mise en Œuvre d'un Outil de Génération d'Images d'Anatomopathologie de Haute Définition à partir de Lames Scannées}{Stage de Spécialité - 4ème année}{Stagiaire : EL IDRISSI Othman\\Tuteur Entreprise : Sébastien HAPDEY (Physicien Médical)\\Enseignant Référent : Benoît GAUZÈRE}{2 juin 2025 - 31 août 2025\\Centre Henri Becquerel, Rouen}
 
-{\huge\bfseries INSA Rouen Normandie}\\[0.5cm]
-{\large Département Sciences et Technologies de l'Information}\\[1.5cm]
-
-{\Large\bfseries RAPPORT DE STAGE DE SPÉCIALITÉ}\\[1cm]
-
-{\huge\bfseries Création et Mise en Œuvre d'un Outil de Génération d'Images d'Anatomopathologie de Haute Définition à partir de Lames Scannées}\\[2cm]
-
-{\large Stage effectué du 2 juin 2025 au 31 août 2025}\\[0.5cm]
-{\large au Centre Henri Becquerel, Rouen}\\[2cm]
-
-\begin{minipage}{0.4\textwidth}
-\begin{flushleft}
-{\large\bfseries Stagiaire :}\\
-EL IDRISSI Othman\\
-Élève ingénieur 4ème année\\
-Spécialité Informatique et Technologies de l'Information
-\end{flushleft}
-\end{minipage}
-\hfill
-\begin{minipage}{0.4\textwidth}
-\begin{flushright}
-{\large\bfseries Encadrement :}\\
-Tuteur entreprise :\\
-M. Sébastien HAPDEY\\
-Physicien Médical\\[0.5cm]
-Enseignant référent :\\
-M. Benoît GAUZÈRE
-\end{flushright}
-\end{minipage}
-
-\vfill
-
-{\large Centre Henri Becquerel}\\
-{\large Rue d'Amiens, CS 11516}\\
-{\large 76038 Rouen Cedex 1, France}\\
-{\large Haute-Normandie}
-
-\end{titlepage}
+% Configuration des en-têtes et pieds de page INSA
+\Page{INSALogo.pdf}{CHB_logo}
 
 % Remerciements
 \chapter*{Remerciements}
@@ -1434,28 +1368,20 @@ Copenhagen University College of Engineering.
 \newpage
 \thispagestyle{empty}
 
-\vspace*{2cm}
-
-\section*{Résumé}
-
+\begin{resume}{Résumé}
 Ce rapport présente le travail accompli au cours de mon stage de spécialité d'une durée de 13 semaines réalisé au sein du Centre Henri Becquerel. Ce stage a porté sur la création et la mise en œuvre d'un outil de génération d'images d'anatomopathologie en haute définition à partir de lames scannées. L'objectif principal était le développement d'un outil professionnel de réarrangement et de suture rigide de fragments tissulaires, répondant aux besoins spécifiques des laboratoires d'imagerie médicale dans la reconstruction d'images histologiques fragmentées.
-
-Ce document propose un aperçu du projet mené dans le cadre du stage de spécialité en Informatique et Technologies de l'Information à l'INSA Rouen Normandie, effectué à la fin de la quatrième année du cycle ingénieur. Le travail réalisé s'inscrit dans une démarche visant à fournir aux laboratoires d'anatomopathologie un outil efficace pour améliorer la qualité et la fiabilité des images obtenues à partir de lames fragmentées.
 
 L'application développée permet de déplacer et réarranger manuellement les fragments histologiques dans un espace de travail, de les orienter correctement puis d'exporter l'image finale en haute définition. Elle facilite ainsi la reconstitution numérique des lames scannées, réduit la complexité des manipulations et offre un support pratique aux médecins et chercheurs pour leurs analyses.
 
 En définitive, ce projet s'inscrit dans une dynamique d'innovation technologique au service de l'imagerie médicale, en proposant une solution adaptée aux enjeux actuels de l'anatomopathologie numérique.
+\end{resume}
 
-\vspace{1cm}
-
-\section*{Abstract}
-
+\begin{resume}{Abstract}
 This report presents the work carried out during my 13-week specialization internship at the Centre Henri Becquerel. The internship focused on the creation and implementation of a tool for generating high-definition anatomic pathology images from scanned slides. The main objective was the development of a professional tool for rearranging and rigidly aligning tissue fragments, addressing the specific needs of medical imaging laboratories for reconstructing fragmented histological images.
-
-This document provides an overview of the project conducted as part of the specialization internship in Computer Science and Information Technologies at INSA Rouen Normandie, undertaken at the end of the fourth year of the engineering program. The work carried out aims to provide an effective tool for pathology laboratories to improve the quality and reliability of images obtained from fragmented slides.
 
 The application developed allows users to manually move and rearrange histological fragments within a workspace, orient them correctly, and then export the final image in high definition. It thus facilitates the digital reconstruction of scanned slides, reduces the complexity of manual handling, and provides practical support to physicians and researchers in their analyses.
 
 Ultimately, this project falls within a dynamic of technological innovation serving medical imaging, offering a solution adapted to the current challenges of digital anatomic pathology.
+\end{resume}
 
 \end{document}

@@ -469,107 +469,353 @@ Résolution max & 50 000 × 50 000 & Support images très haute résolution \\
 
 \section{Propositions et critiques de solutions}
 
-\subsection{Solutions existantes explorées}
+\subsection{Analyse des solutions existantes}
 
-L'analyse de l'état de l'art a révélé plusieurs solutions existantes, résumées dans le tableau suivant :
+Dans le cadre du développement d'un outil de suture d'images histologiques pour le projet TEP Margins, une analyse approfondie des technologies existantes a été menée. Cette étude comparative vise à identifier les forces et faiblesses de chaque solution pour justifier le choix final d'architecture.
 
-\vspace{1em}
+\subsubsection{Méthodologie d'Évaluation}
+
+\begin{tcolorbox}[colback=TechBlue!10, colframe=TechBlue, title=Critères d'Évaluation]
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Scalabilité} : Capacité à traiter un nombre variable de fragments
+    \item \textbf{Formats supportés} : Compatibilité avec SVS, MRXS, TIFF pyramidal
+    \item \textbf{Algorithmes} : Robustesse des méthodes de suture
+    \item \textbf{Interface utilisateur} : Ergonomie et facilité d'utilisation
+    \item \textbf{Maintenance} : État de développement et support communautaire
+    \item \textbf{Déploiement} : Facilité d'installation en environnement clinique
+\end{itemize}
+\end{tcolorbox}
+
+\subsubsection{Technologies Analysées}
+
+\paragraph{PyThostitcher}
+
+\begin{tcolorbox}[colback=TechBlue!10, colframe=TechBlue, title=PyThostitcher - Outil Python de Suture SIFT]
+
+\textbf{Développeur :} Communauté Python scientifique \\
+\textbf{Langage :} Python \\
+\textbf{Licence :} Open Source
+
+\vspace{0.5cm}
+
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\rowcolor{LightGray}
+\textbf{Fonctionnement} & \textbf{Architecture Technique} \\
+\hline
+Utilise des descripteurs SIFT (Scale-Invariant Feature Transform) pour détecter des points d'intérêt dans les images & 
+\begin{itemize}[nosep]
+\item Détection de caractéristiques SIFT
+\item Algorithmes de correspondance
+\item Optimisation globale des positions
+\item Interface Python native
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\vspace{0.5cm}
+
+\textbf{Avantages identifiés :}
+\begin{itemize}[leftmargin=*]
+    \pro{Algorithmes SIFT robustes et éprouvés}
+    \pro{Implémentation Python moderne}
+    \pro{Optimisation globale des correspondances}
+    \pro{Documentation technique disponible}
+\end{itemize}
+
+\textbf{Limitations critiques :}
+\begin{itemize}[leftmargin=*]
+    \con{Traitement limité à 2-4 fragments maximum}
+    \con{Contrainte architecturale non extensible}
+    \con{Inadapté aux cas complexes (>5 fragments)}
+    \con{Pas de support des formats médicaux spécialisés}
+\end{itemize}
+
 \begin{center}
-\textbf{\large Comparaison des solutions existantes}
+\textbf{\textcolor{DangerRed}{DÉCISION : REJETÉ}}\\
+\textit{Limitations de scalabilité incompatibles avec les besoins}
 \end{center}
-\vspace{0.5em}
 
-\begin{table}[H]
+\end{tcolorbox}
+
+\paragraph{HistoStitcher}
+
+\begin{tcolorbox}[colback=WarningOrange!10, colframe=WarningOrange, title=HistoStitcher - Solution MATLAB Historique]
+
+\textbf{Développeur :} Laboratoire de recherche académique \\
+\textbf{Plateforme :} MATLAB \\
+\textbf{Statut :} Obsolète (non maintenu)
+
+\vspace{0.5cm}
+
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\rowcolor{LightGray}
+\textbf{Approche Technique} & \textbf{Spécialisation Histologique} \\
+\hline
+Implémente des algorithmes de corrélation croisée et de transformation affine spécialement conçus pour l'imagerie histologique &
+\begin{itemize}[nosep]
+\item Interface graphique MATLAB
+\item Algorithmes de corrélation croisée
+\item Transformations affines optimisées
+\item Calibration pour tissus biologiques
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\vspace{0.5cm}
+
+\textbf{Points positifs historiques :}
+\begin{itemize}[leftmargin=*]
+    \pro{Spécialisé pour l'imagerie histologique}
+    \pro{Algorithmes de corrélation éprouvés}
+    \pro{Interface graphique intégrée}
+\end{itemize}
+
+\textbf{Obstacles majeurs :}
+\begin{itemize}[leftmargin=*]
+    \con{Outil ancien sans maintenance active}
+    \con{Dépendance MATLAB coûteuse et restrictive}
+    \con{Incompatibilité avec formats SVS/MRXS modernes}
+    \con{Déploiement clinique complexe}
+    \con{Pas d'évolution technologique récente}
+\end{itemize}
+
+\begin{center}
+\textbf{\textcolor{DangerRed}{DÉCISION : REJETÉ}}\\
+\textit{Obsolescence technique et limitations de déploiement}
+\end{center}
+
+\end{tcolorbox}
+
+\paragraph{ASHLAR}
+
+\begin{tcolorbox}[colback=SuccessGreen!10, colframe=SuccessGreen, title=ASHLAR - Solution Harvard Medical School]
+
+\textbf{Développeur :} Laboratory of Systems Pharmacology, Harvard Medical School \\
+\textbf{Nom complet :} Alignment by Simultaneous Harmonization of Layer/Adjacency Registration \\
+\textbf{Statut :} Activement développé et maintenu
+
+\vspace{0.5cm}
+
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\rowcolor{LightGray}
+\textbf{Technologies Avancées} & \textbf{Capacités Biomédicales} \\
+\hline
+Algorithmes sophistiqués de détection de caractéristiques avec optimisation globale multi-échelle &
+\begin{itemize}[nosep]
+\item Support natif formats biomédicaux
+\item Correction d'illumination automatique
+\item Algorithmes de déformation robustes
+\item Pipeline de traitement optimisé
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\vspace{0.5cm}
+
+\textbf{Excellence technique :}
+\begin{itemize}[leftmargin=*]
+    \pro{Algorithmes de pointe développés par Harvard}
+    \pro{Support natif des formats d'imagerie biomédicale}
+    \pro{Correction automatique d'illumination et déformation}
+    \pro{Optimisation globale multi-échelle}
+    \pro{Documentation scientifique complète}
+    \pro{Maintenance active et évolutions régulières}
+\end{itemize}
+
+\textbf{Contrainte fondamentale :}
+\begin{itemize}[leftmargin=*]
+    \con{Nécessite des zones de chevauchement entre fragments}
+    \con{Inadapté aux tissus découpés physiquement}
+    \con{Algorithmes basés sur la détection de correspondances}
+    \con{Incompatible avec notre contexte sans recouvrement}
+\end{itemize}
+
+\begin{center}
+\textbf{\textcolor{WarningOrange}{DÉCISION : REJETÉ}}\\
+\textit{Excellente technologie mais inadaptée à nos données spécifiques}
+\end{center}
+
+\end{tcolorbox}
+
+\paragraph{FIJI/ImageJ}
+
+\begin{tcolorbox}[colback=InfoGray!10, colframe=InfoGray, title=FIJI - Distribution ImageJ Enrichie]
+
+\textbf{Nom complet :} Fiji Is Just ImageJ \\
+\textbf{Écosystème :} Plateforme open-source avec plugins communautaires \\
+\textbf{Spécialisation :} Analyse d'images scientifiques
+
+\vspace{0.5cm}
+
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\rowcolor{LightGray}
+\textbf{Architecture Modulaire} & \textbf{Plugins de Suture} \\
+\hline
+Plateforme extensible avec écosystème de plugins spécialisés pour l'analyse d'images scientifiques &
+\begin{itemize}[nosep]
+\item Plugin "Stitching" intégré
+\item Algorithmes phase-correlation
+\item Interface graphique complète
+\item Extensibilité par plugins
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\vspace{0.5cm}
+
+\textbf{Avantages de l'écosystème :}
+\begin{itemize}[leftmargin=*]
+    \pro{Plateforme mature et stable}
+    \pro{Large communauté scientifique}
+    \pro{Plugins spécialisés nombreux}
+    \pro{Interface utilisateur familière}
+    \pro{Documentation extensive}
+\end{itemize}
+
+\textbf{Limitations pour notre usage :}
+\begin{itemize}[leftmargin=*]
+    \con{Même problématique qu'ASHLAR : nécessite des zones communes}
+    \con{Algorithmes phase-correlation inadaptés sans chevauchement}
+    \con{Pas d'adaptation possible aux tissus découpés}
+    \con{Interface généraliste non optimisée pour notre cas d'usage}
+\end{itemize}
+
+\begin{center}
+\textbf{\textcolor{DangerRed}{DÉCISION : REJETÉ}}\\
+\textit{Mêmes limitations fondamentales qu'ASHLAR}
+\end{center}
+
+\end{tcolorbox}
+
+\paragraph{Plugin Napari}
+
+\begin{tcolorbox}[colback=TechBlue!10, colframe=TechBlue, title=Napari - Plateforme de Visualisation Moderne]
+
+\textbf{Technologie :} Python, Qt, OpenGL \\
+\textbf{Spécialisation :} Visualisation d'images multi-dimensionnelles \\
+\textbf{Architecture :} Modulaire avec système de plugins
+
+\vspace{0.5cm}
+
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\rowcolor{LightGray}
+\textbf{Capacités Avancées} & \textbf{Architecture Plugin} \\
+\hline
+Plateforme moderne de visualisation avec support natif des images pyramidales et outils d'interaction avancés &
+\begin{itemize}[nosep]
+\item Visualisation images pyramidales
+\item Architecture modulaire extensible
+\item Outils d'interaction avancés
+\item Rendu OpenGL optimisé
+\end{itemize} \\
+\hline
+\end{tabularx}
+
+\vspace{0.5cm}
+
+\textbf{Potentiel technique :}
+\begin{itemize}[leftmargin=*]
+    \pro{Plateforme moderne et performante}
+    \pro{Support natif des images pyramidales}
+    \pro{Architecture plugin flexible}
+    \pro{Outils d'interaction avancés}
+    \pro{Communauté active de développeurs}
+\end{itemize}
+
+\textbf{Limitation architecturale bloquante :}
+\begin{itemize}[leftmargin=*]
+    \con{Un seul fragment visualisable par canvas}
+    \con{Impossible de manipuler plusieurs fragments simultanément}
+    \con{Architecture non adaptée à la suture multi-fragments}
+    \con{Nécessiterait une refonte architecturale majeure}
+\end{itemize}
+
+\begin{center}
+\textbf{\textcolor{DangerRed}{DÉCISION : REJETÉ}}\\
+\textit{Limitations architecturales fondamentales}
+\end{center}
+
+\end{tcolorbox}
+
+\subsubsection{Synthèse Comparative}
+
+\begin{table}[h!]
 \centering
-\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|p{3cm}|}
+\caption{Tableau Comparatif des Technologies Évaluées}
+\begin{tabularx}{\textwidth}{|l|C{2cm}|C{2cm}|C{2cm}|C{2cm}|C{2cm}|}
 \hline
-\rowcolor{TableHeaderColor}
-\textbf{Solution} & \textbf{Avantages} & \textbf{Limitations} & \textbf{Décision} \\
+\rowcolor{LightGray}
+\textbf{Technologie} & \textbf{Scalabilité} & \textbf{Formats Médicaux} & \textbf{Maintenance} & \textbf{Déploiement} & \textbf{Verdict} \\
 \hline
-PyThostitcher & Algorithmes SIFT robustes & Max 2-4 fragments & Rejetée \\
+PyThostitcher & \textcolor{DangerRed}{\faTimes} & \textcolor{WarningOrange}{\faExclamationTriangle} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{DangerRed}{REJETÉ} \\
 \hline
-HistoStitcher & Interface MATLAB & Obsolète, pas SVS/MRXS & Rejetée \\
+HistoStitcher & \textcolor{WarningOrange}{\faExclamationTriangle} & \textcolor{DangerRed}{\faTimes} & \textcolor{DangerRed}{\faTimes} & \textcolor{DangerRed}{\faTimes} & \textcolor{DangerRed}{REJETÉ} \\
 \hline
-ASHLAR & Algorithmes sophistiqués & Nécessite chevauchement & Rejetée \\
+ASHLAR & \textcolor{SuccessGreen}{\faCheck} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{WarningOrange}{INADAPTÉ} \\
 \hline
-FIJI/ImageJ & Écosystème riche & Pas de chevauchement & Rejetée \\
+FIJI/ImageJ & \textcolor{SuccessGreen}{\faCheck} & \textcolor{WarningOrange}{\faExclamationTriangle} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{DangerRed}{REJETÉ} \\
 \hline
-Plugin Napari & Plateforme moderne & Un fragment par canvas & Rejetée \\
+Plugin Napari & \textcolor{DangerRed}{\faTimes} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{SuccessGreen}{\faCheck} & \textcolor{DangerRed}{REJETÉ} \\
 \hline
-\end{tabular}
-\caption{Analyse comparative des solutions existantes}
+\end{tabularx}
 \end{table}
 
-\subsubsection{PyThostitcher}
+\subsubsection{Justification de la Solution Retenue}
 
-PyThostitcher est un outil de suture d'images développé en Python, basé sur des algorithmes de détection de caractéristiques et d'optimisation de correspondances.
+\begin{tcolorbox}[colback=SuccessGreen!10, colframe=SuccessGreen, title=Développement Personnalisé - Solution Optimale]
 
-\textbf{Fonctionnement} : L'outil utilise des descripteurs SIFT (Scale-Invariant Feature Transform) pour détecter des points d'intérêt dans les images, puis applique des algorithmes de correspondance pour identifier les zones de chevauchement entre fragments. Un processus d'optimisation globale permet ensuite d'ajuster les positions relatives des fragments.
+Face aux limitations identifiées dans toutes les solutions existantes, le développement d'un outil personnalisé s'impose comme la seule approche viable.
 
-\textbf{Limitations identifiées} : La principale limitation réside dans sa capacité à traiter uniquement des couples de 2 ou 4 fragments maximum. Cette contrainte architecturale rend l'outil inadapté à notre contexte où le nombre de fragments peut être variable et potentiellement plus élevé.
+\vspace{0.5cm}
 
-\textbf{Décision} : Rejet de cette solution en raison de ses limitations de scalabilité.
-
-\subsubsection{HistoStitcher}
-
-HistoStitcher est un outil historique développé pour MATLAB, spécialisé dans l'assemblage d'images histologiques.
-
-\textbf{Fonctionnement} : L'outil implémente des algorithmes de corrélation croisée et de transformation affine pour aligner les fragments d'images histologiques. Il propose une interface graphique intégrée à l'environnement MATLAB.
-
-\textbf{Limitations identifiées} : L'outil présente plusieurs défauts majeurs : il est ancien et n'est plus maintenu, il ne supporte pas la lecture des formats SVS/MRXS modernes, et sa dépendance à MATLAB limite son déploiement dans un environnement clinique.
-
-\textbf{Décision} : Rejet de cette solution en raison de son obsolescence et de ses limitations techniques.
-
-\subsubsection{ASHLAR}
-
-ASHLAR (Alignment by Simultaneous Harmonization of Layer/Adjacency Registration) est un outil moderne développé par le Laboratory of Systems Pharmacology de Harvard Medical School.
-
-\textbf{Fonctionnement} : ASHLAR utilise des algorithmes sophistiqués de détection de caractéristiques et d'optimisation globale pour assembler des mosaïques d'images. Il supporte nativement les formats d'imagerie biomédicale et propose des algorithmes robustes de correction d'illumination et de déformation.
-
-\textbf{Limitations identifiées} : L'outil fonctionne uniquement si les fragments de tissus contiennent des zones de chevauchement significatives. Dans notre contexte, où le tissu tumoral est découpé physiquement sans zones de recouvrement, ASHLAR ne peut pas identifier les correspondances nécessaires à l'alignement automatique.
-
-\textbf{Décision} : Bien que techniquement excellente, cette solution n'est pas utilisable avec nos données spécifiques.
-
-\subsubsection{FIJI/ImageJ}
-
-FIJI (Fiji Is Just ImageJ) est une distribution d'ImageJ enrichie de plugins pour l'analyse d'images scientifiques.
-
-\textbf{Fonctionnement} : FIJI propose plusieurs plugins de suture d'images, notamment le plugin "Stitching" qui utilise des algorithmes de détection de caractéristiques phase-correlation pour assembler des mosaïques.
-
-\textbf{Limitations identifiées} : Comme ASHLAR, FIJI nécessite des zones d'intérêt communes entre les images pour effectuer une suture automatique. L'absence de chevauchement dans nos images rend cette approche inefficace.
-
-\textbf{Décision} : Rejet de cette solution pour les mêmes raisons qu'ASHLAR.
-
-\subsubsection{Développement de plugin Napari}
-
-Napari est une plateforme moderne de visualisation d'images multi-dimensionnelles développée en Python.
-
-\textbf{Fonctionnement} : Napari propose une architecture modulaire permettant le développement de plugins personnalisés. La plateforme supporte nativement la visualisation d'images pyramidales et offre des outils d'interaction avancés.
-
-\textbf{Limitations identifiées} : La principale limitation réside dans l'architecture de Napari qui ne permet de visualiser qu'un seul fragment à la fois par canvas. Cette contrainte rend impossible la manipulation simultanée de plusieurs fragments nécessaire à notre application.
-
-\textbf{Décision} : Rejet de cette solution en raison de ses limitations architecturales.
-
-\subsection{Solution retenue : développement personnalisé}
-
-Face aux limitations des solutions existantes, nous avons opté pour le développement d'un outil personnalisé \textit{from scratch}. Cette approche présente plusieurs avantages décisifs :
-
-\textbf{Avantages} :
-\begin{itemize}
-\item Performance optimale avec accès direct aux ressources système
-\item Contrôle total sur l'interface utilisateur et l'expérience
-\item Sécurité maximale avec traitement local des données
-\item Adaptation parfaite aux besoins spécifiques du projet TEP Margins
+\textbf{Analyse des Contraintes Spécifiques :}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Tissus découpés physiquement} : Absence de zones de chevauchement
+    \item \textbf{Nombre variable de fragments} : De 2 à 15+ fragments par cas
+    \item \textbf{Formats spécialisés} : SVS, MRXS, TIFF pyramidal obligatoires
+    \item \textbf{Environnement clinique} : Sécurité et fiabilité maximales requises
 \end{itemize}
 
-\textbf{Inconvénients} :
-\begin{itemize}
-\item Distribution plus complexe nécessitant un packaging spécialisé
-\item Temps de développement élevé
-\item Maintenance et évolution à long terme à prévoir
+\vspace{0.5cm}
+
+\textbf{Avantages Décisifs du Développement Personnalisé :}
+\begin{itemize}[leftmargin=*]
+    \pro{Performance optimale avec accès direct aux ressources système}
+    \pro{Contrôle total sur l'interface utilisateur et l'expérience}
+    \pro{Sécurité maximale avec traitement local des données}
+    \pro{Adaptation parfaite aux besoins spécifiques du projet TEP Margins}
+    \pro{Évolutivité complète selon les retours utilisateurs}
+    \pro{Indépendance technologique et maintenance maîtrisée}
 \end{itemize}
 
-\section{Description complète de la solution retenue}
+\vspace{0.5cm}
+
+\textbf{Défis à Relever :}
+\begin{itemize}[leftmargin=*]
+    \con{Temps de développement élevé (13 semaines)}
+    \con{Distribution nécessitant un packaging spécialisé}
+    \con{Maintenance et évolution à long terme à prévoir}
+    \con{Tests exhaustifs en environnement clinique requis}
+\end{itemize}
+
+\end{tcolorbox}
+
+L'analyse comparative approfondie des technologies existantes révèle que **aucune solution disponible ne répond aux contraintes spécifiques** du projet TEP Margins. Les outils analysés présentent tous des limitations fondamentales :
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Contraintes de scalabilité} (PyThostitcher, Napari)
+    \item \textbf{Obsolescence technique} (HistoStitcher)
+    \item \textbf{Inadéquation algorithmique} (ASHLAR, FIJI)
+\end{itemize}
+
+Le **développement d'un outil personnalisé** constitue donc la seule approche permettant de répondre efficacement aux besoins identifiés, tout en garantissant une solution pérenne et évolutive pour le Centre Henri Becquerel.
+
+\subsection{Description complète de la solution choisie}
 
 \clearpage
 

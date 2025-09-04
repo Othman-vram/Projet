@@ -16,8 +16,8 @@
 % Définition des couleurs pour les titres
 \definecolor{ChapterColor}{RGB}{0, 51, 102}      % Bleu foncé INSA
 \definecolor{SectionColor}{RGB}{74, 144, 226}    % Bleu moyen
-\definecolor{SubsectionColor}{RGB}{52, 152, 219} % Bleu clair
-\definecolor{SubsubsectionColor}{RGB}{155, 89, 182} % Violet
+\definecolor{SubsectionColor}{RGB}{100, 149, 237} % Bleu clair
+\definecolor{SubsubsectionColor}{RGB}{30, 144, 255} % Bleu dodger
 \definecolor{TableHeaderColor}{RGB}{230, 240, 250} % Bleu très clair pour tableaux
 
 % Configuration des titres avec couleurs
@@ -39,8 +39,21 @@
 
 % Espacement amélioré
 \setstretch{1.2}
-\setlength{\parskip}{0.5em}
+\setlength{\parskip}{0.8em}
 \setlength{\parindent}{0pt}
+
+% Amélioration des marges et espacement
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{2em}{1.5em}
+\titlespacing*{\subsection}{0pt}{1.5em}{1em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.8em}
+
+% Éviter les veuves et orphelines
+\widowpenalty=10000
+\clubpenalty=10000
+
+% Améliorer les sauts de page
+\raggedbottom
 
 % Forcer les chapitres sur nouvelle page
 \let\oldchapter\chapter
@@ -235,6 +248,13 @@ C'est dans ce contexte que s'inscrit mon stage : le développement d'un \textbf{
 
 \section{Définitions des termes techniques}
 
+\vspace{1em}
+
+\begin{center}
+\textbf{\large Glossaire des termes techniques utilisés}
+\end{center}
+\vspace{1em}
+
 Cette section présente les définitions de tous les termes techniques utilisés dans ce rapport.
 
 \begin{longtable}{|p{4cm}|p{10cm}|}
@@ -339,6 +359,12 @@ Le projet se divise en deux phases principales présentées dans les tableaux su
 
 \subsubsection{Phase de prétraitement}
 
+\vspace{1em}
+\begin{center}
+\textbf{\large Besoins fonctionnels - Phase de prétraitement}
+\end{center}
+\vspace{0.5em}
+
 \begin{longtable}{|p{3.5cm}|p{1.5cm}|p{9cm}|}
 \hline
 \rowcolor{TableHeaderColor}
@@ -362,6 +388,12 @@ Préservation métadonnées & Moyenne & Conserver informations importantes (dime
 \end{longtable}
 
 \subsubsection{Phase de reconstitution et suture manuelle}
+
+\vspace{1em}
+\begin{center}
+\textbf{\large Besoins fonctionnels - Phase de reconstitution}
+\end{center}
+\vspace{0.5em}
 
 \begin{longtable}{|p{3.5cm}|p{1.5cm}|p{9cm}|}
 \hline
@@ -408,6 +440,12 @@ Gestion opacité & Moyenne & Ajuster opacité pour visualiser superpositions \\
 
 \subsection{Besoins non fonctionnels}
 
+\vspace{1em}
+\begin{center}
+\textbf{\large Exigences de performance et contraintes techniques}
+\end{center}
+\vspace{0.5em}
+
 \begin{table}[H]
 \centering
 \begin{tabular}{|p{4cm}|p{3cm}|p{7cm}|}
@@ -434,6 +472,12 @@ Résolution max & 50 000 × 50 000 & Support images très haute résolution \\
 \subsection{Solutions existantes explorées}
 
 L'analyse de l'état de l'art a révélé plusieurs solutions existantes, résumées dans le tableau suivant :
+
+\vspace{1em}
+\begin{center}
+\textbf{\large Comparaison des solutions existantes}
+\end{center}
+\vspace{0.5em}
 
 \begin{table}[H]
 \centering
@@ -528,6 +572,20 @@ Face aux limitations des solutions existantes, nous avons opté pour le dévelop
 \section{Description complète de la solution retenue}
 
 \clearpage
+
+\vspace{0.5em}
+
+\begin{center}
+Vue du manque d'outils répondant à nos besoins spécifiques, nous avons choisi de développer un outil personnalisé \textit{from scratch}. Cette approche présente des avantages décisifs :
+
+\begin{itemize}
+    \item Performance optimale avec accès direct aux ressources système
+    \item Contrôle total sur l'interface utilisateur et l'expérience
+    \item Sécurité maximale avec traitement local des données
+    \item Adaptabilité complète aux besoins du Centre Henri Becquerel
+\end{itemize}
+\end{center}
+\vspace{1em}
 
 \subsection{Architecture générale du système}
 
@@ -838,7 +896,15 @@ L'application desktop est développée en Python avec le framework PyQt6, qui fo
 
 \section{Mise en œuvre}
 
+\vspace{0.5em}
+
 \subsection{Environnement de développement et technologies}
+
+\vspace{1em}
+\begin{center}
+\textbf{\large Stack technologique utilisée}
+\end{center}
+\vspace{0.5em}
 
 \subsubsection{Stack technologique}
 
@@ -1113,6 +1179,8 @@ def export_pyramidal_tiff(self, fragments: List[Fragment],
 
 \clearpage
 
+\vspace{0.5em}
+
 \subsection{Fonctionnalités réalisées et validation}
 
 \subsubsection{Pipeline de prétraitement}
@@ -1144,6 +1212,12 @@ L'application desktop offre toutes les fonctionnalités essentielles identifiée
 \textbf{Exportation} : Export PNG pour aperçus et TIFF pyramidal avec sélection des niveaux de résolution. Préservation complète de la qualité d'image.
 
 \subsection{Métriques de performance}
+
+\vspace{1em}
+\begin{center}
+\textbf{\large Performances mesurées du système}
+\end{center}
+\vspace{0.5em}
 
 \subsubsection{Performance de l'interface}
 
@@ -1192,6 +1266,12 @@ Compatibilité formats & SVS/MRXS/TIFF & Tests multi-constructeurs \\
 \end{table}
 
 \subsection{Validation utilisateur}
+
+\vspace{1em}
+\begin{center}
+\textbf{\large Retours d'expérience des utilisateurs finaux}
+\end{center}
+\vspace{0.5em}
 
 \subsubsection{Tests d'acceptation}
 
@@ -1274,6 +1354,8 @@ Le travail réalisé contribue à l'avancement des pratiques en anatomopathologi
 \section{Mise en œuvre technique et organisationnelle}
 
 \clearpage
+
+\vspace{0.5em}
 
 \subsection{Environnement de développement}
 
@@ -1447,6 +1529,14 @@ La transparence des algorithmes utilisés constitue un autre aspect éthique imp
 
 \clearpage
 
+\vspace{0.5em}
+
+\begin{center}
+Ce stage de spécialité au Centre Henri Becquerel a permis de développer avec succès un outil professionnel de réarrangement et de suture rigide de fragments tissulaires, répondant aux besoins spécifiques du projet TEP Margins.
+\end{center}
+
+\vspace{1em}
+
 \section{Bilan du stage}
 
 Ce stage de spécialité au Centre Henri Becquerel a constitué une expérience particulièrement enrichissante, tant sur le plan technique que professionnel. Le développement d'un outil de génération d'images d'anatomopathologie de haute définition m'a permis d'appliquer concrètement les connaissances acquises durant ma formation d'ingénieur tout en découvrant les spécificités du domaine médical.
@@ -1477,6 +1567,12 @@ La solution actuelle se concentre sur les formats SVS et MRXS, mais l'écosystè
 
 \subsection{Perspectives d'évolution}
 
+\begin{center}
+L'outil développé constitue une base solide pour de futures améliorations :
+\end{center}
+
+\vspace{0.5em}
+
 Plusieurs axes d'évolution prometteurs ont été identifiés pour améliorer et étendre les capacités de l'outil.
 
 \textbf{Intelligence artificielle} : L'intégration d'algorithmes d'apprentissage automatique pourrait considérablement améliorer l'efficacité de la segmentation et de l'alignement. Les récents progrès en vision par ordinateur, notamment les modèles de type Vision Transformer, offrent des perspectives intéressantes pour l'analyse automatique des structures histologiques.
@@ -1496,6 +1592,14 @@ Ce projet s'inscrit dans une dynamique plus large de transformation numérique d
 La méthodologie développée et les solutions techniques mises en œuvre constituent une base solide pour le développement d'autres outils d'imagerie médicale. L'approche modulaire et extensible facilite l'adaptation à de nouveaux besoins et l'intégration de nouvelles technologies.
 
 L'expérience acquise dans ce projet contribue également à la formation d'une expertise locale en imagerie médicale numérique au Centre Henri Becquerel, renforçant les capacités de recherche et d'innovation de l'établissement.
+
+\subsection{Apports personnels}
+
+\begin{center}
+Ce stage m'a permis d'acquérir une expertise approfondie en :
+\end{center}
+
+\vspace{0.5em}
 
 En conclusion, ce stage a permis de développer une solution technique répondant à un besoin concret tout en contribuant à l'avancement des pratiques en anatomopathologie numérique. Les résultats obtenus et les perspectives d'évolution identifiées confirment la pertinence de l'approche adoptée et ouvrent la voie à de futurs développements dans ce domaine en pleine expansion.
 

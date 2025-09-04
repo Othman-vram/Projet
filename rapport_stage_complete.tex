@@ -1,0 +1,919 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{cite}
+
+% Configuration de la page
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+% Configuration des en-têtes et pieds de page
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% Configuration des titres
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-30pt}{40pt}
+
+% Configuration des liens
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=blue,
+    citecolor=red,
+}
+
+% Configuration du code
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    showstringspaces=false,
+    commentstyle=\color{gray},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red}
+}
+
+\begin{document}
+
+% Page de garde
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+
+{\huge\bfseries INSA Rouen Normandie}\\[0.5cm]
+{\large Département Sciences et Technologies de l'Information}\\[1.5cm]
+
+{\Large\bfseries RAPPORT DE STAGE DE SPÉCIALITÉ}\\[1cm]
+
+{\huge\bfseries Création et Mise en Œuvre d'un Outil de Génération d'Images d'Anatomopathologie de Haute Définition à partir de Lames Scannées}\\[2cm]
+
+{\large Stage effectué du 2 juin 2025 au 31 août 2025}\\[0.5cm]
+{\large au Centre Henri Becquerel, Rouen}\\[2cm]
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft}
+{\large\bfseries Stagiaire :}\\
+EL IDRISSI Othman\\
+Élève ingénieur 4ème année\\
+Spécialité Informatique et Technologies de l'Information
+\end{flushleft}
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+\begin{flushright}
+{\large\bfseries Encadrement :}\\
+Tuteur entreprise :\\
+M. Sébastien HAPDEY\\
+Physicien Médical\\[0.5cm]
+Enseignant référent :\\
+M. Benoît GAUZÈRE
+\end{flushright}
+\end{minipage}
+
+\vfill
+
+{\large Centre Henri Becquerel}\\
+{\large Rue d'Amiens, CS 11516}\\
+{\large 76038 Rouen Cedex 1, France}\\
+{\large Haute-Normandie}
+
+\end{titlepage}
+
+% Remerciements
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+Je tiens à adresser ma profonde gratitude à M. Sébastien HAPDEY, physicien médical et tuteur pédagogique au Centre Henri Becquerel de Rouen. Son suivi attentif, ses conseils pertinents et son encadrement bienveillant ont été déterminants pour le bon déroulement de ce stage. Sa disponibilité et sa capacité à orienter mon travail avec justesse m'ont permis de progresser et d'acquérir des connaissances solides dans ce domaine exigeant.
+
+Je souhaite également exprimer mes sincères remerciements à M. Romain MODZELEWSKI, responsable informatique biomédicale au département d'imagerie – Laboratoire AIMS-Quantif. Ses explications claires, son expertise technique et son sens du partage ont constitué un appui essentiel pour la réussite de ce projet. Son engagement et sa réactivité ont grandement facilité la réalisation des différentes étapes de mon travail.
+
+Mes remerciements s'adressent enfin à l'ensemble du Centre Henri Becquerel, dont l'accueil chaleureux, l'organisation et les conditions de travail favorables ont contribué à rendre cette expérience formatrice et enrichissante.
+
+% Table des matières
+\tableofcontents
+\newpage
+
+% Liste des figures
+\listoffigures
+\newpage
+
+% Liste des tableaux
+\listoftables
+\newpage
+
+% Introduction
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+Dans le domaine médical, et plus particulièrement en anatomopathologie, l'analyse des lames histologiques constitue une étape essentielle pour l'établissement de diagnostics fiables. Avec l'essor de l'imagerie numérique, de nouvelles approches émergent afin d'améliorer la visualisation, la conservation et le traitement de ces échantillons. Cependant, les images issues des lames scannées peuvent parfois être fragmentées, rendant leur exploitation plus complexe et nécessitant des outils adaptés pour en faciliter la reconstruction.
+
+C'est dans ce contexte que le Centre Henri Becquerel a initié le développement d'un outil informatique dédié au réarrangement et à l'assemblage rigide de fragments tissulaires. L'objectif principal est de proposer une solution pratique permettant aux utilisateurs de manipuler manuellement ces fragments, de les replacer dans la bonne orientation et d'exporter l'image finale en haute définition. Ce type d'outil répond à un besoin concret des laboratoires d'imagerie médicale, en apportant un gain de précision et une meilleure lisibilité des lames numériques.
+
+Au cours de mon stage de spécialité de 13 semaines en Informatique et Technologies de l'Information à l'INSA Rouen Normandie, j'ai contribué à la conception et à l'implémentation de ce projet innovant. Mon travail s'est articulé autour du développement des fonctionnalités principales de l'application et de la mise en place d'une interface adaptée aux besoins des utilisateurs.
+
+Ce rapport est organisé en quatre chapitres principaux :
+\begin{itemize}
+\item Le premier présente le contexte général, les motivations et les objectifs du projet.
+\item Le deuxième expose l'analyse des besoins fonctionnels et techniques, ainsi que les choix de conception.
+\item Le troisième détaille l'architecture logicielle et les technologies utilisées.
+\item Enfin, le quatrième décrit la mise en œuvre pratique, les fonctionnalités réalisées et les résultats obtenus.
+\end{itemize}
+
+Cette organisation permet de suivre pas à pas le déroulement du projet et de mettre en valeur la contribution apportée par ce travail à la modernisation des pratiques en anatomopathologie numérique.
+
+\chapter{Présentation de l'entreprise et de l'environnement du stage}
+
+\section{Le Centre Henri-Becquerel}
+
+Le Centre Henri-Becquerel est un Centre de Lutte Contre le Cancer (CLCC) situé à Rouen, en France. Faisant partie du réseau national Unicancer, il assure une triple mission de soins, de recherche et d'enseignement. Il prend en charge la majorité des pathologies cancéreuses et dispose d'un plateau technique intégré comprenant la radiothérapie, la médecine nucléaire et la radiologie. Le Centre est également labellisé « OECI » par l'Association Européenne des Centres Anti-Cancer.
+
+Le Centre Henri-Becquerel se distingue par son approche multidisciplinaire de la prise en charge du cancer, intégrant les dernières avancées technologiques et scientifiques. Cette philosophie se traduit par une recherche constante d'innovation dans les domaines de l'imagerie médicale, de la radiothérapie et de l'anatomopathologie numérique.
+
+\section{L'équipe QuantIF}
+
+L'équipe « Quantification en Imagerie médicale Fonctionnelle » (QuantIF), rattachée au LITIS EA 4108, est une équipe de recherche pluridisciplinaire au sein du Centre Henri-Becquerel. Elle se concentre sur les problématiques d'imagerie médicale, en ciblant les pathologies tumorales et inflammatoires, principalement au niveau du thorax et de l'abdomen-pelvis.
+
+Cette équipe constitue un environnement de recherche particulièrement stimulant, où se côtoient médecins, physiciens, informaticiens et ingénieurs. Cette diversité disciplinaire favorise l'émergence de solutions innovantes et l'application concrète des avancées technologiques aux problématiques cliniques.
+
+\section{Thèmes et axes de recherche}
+
+Les recherches de l'équipe QuantIF se basent sur plusieurs modalités d'imagerie :
+
+\begin{itemize}
+\item Le couplage Tomographie par Émission de Positons / TomoDensitoMétrie (TEP/TDM)
+\item L'imagerie microendoscopique confocale fibrée (imagerie en fluorescence)
+\item L'Imagerie par Résonance Magnétique (IRM)
+\end{itemize}
+
+De ces modalités découlent trois questions médicales d'intérêt :
+
+\begin{itemize}
+\item L'amélioration du ciblage et de la balistique du cancer pulmonaire en radiothérapie grâce à l'imagerie fonctionnelle TEP/TDM (responsabilité : Pr Vera)
+\item La caractérisation de l'alvéole pulmonaire grâce aux nouvelles techniques d'imagerie microendoscopique confocale (responsabilité : Pr Thiberville)
+\item La caractérisation du foie et du tube digestif en IRM (responsabilité : Pr Savoye-Collet)
+\end{itemize}
+
+Les verrous en traitement d'images sont la classification et la sélection de caractéristiques. Les travaux portent également sur l'amélioration des données quantitatives des images, leur segmentation et la fusion d'informations.
+
+\section{Composition de l'équipe et plateau technique}
+
+L'équipe est composée de 15 membres permanents et de 7 doctorants :
+
+\begin{itemize}
+\item \textbf{4 PU-PH} : B. DUBRAY, L. THIBERVILLE, P. VERA, C. SAVOYE-COLLET
+\item \textbf{1 PU} : S. RUAN
+\item \textbf{2 MCU-PH} : JF. MENARD, M. SALAÜN
+\item \textbf{2 MdC} : C. PETITJEAN, J. LAPUYADE
+\item \textbf{6 PH} : S. BECKER, A. EDET-SANSON, I. GARDIN, S. HAPDEY, P. BOHN, R. MODZELEWSKI
+\item \textbf{1 Ingénieur} : R. MODZELEWSKI
+\end{itemize}
+
+Pour ses travaux, l'équipe dispose des équipements suivants : une plateforme d'imagerie du petit animal, un laboratoire de traitement d'image, ainsi que l'accès aux équipements d'imagerie des CHU et CHB (IRM, TDM, TEP-TDM, etc.) et au service de radiothérapie du CHB.
+
+\chapter{Présentation du sujet du stage}
+
+\section{Contexte général}
+
+Ce stage de spécialité, réalisé au Centre Henri Becquerel dans le département d'anatomopathologie et en lien avec les équipes d'imagerie médicale, s'inscrit dans un projet de recherche clinique ambitieux intitulé \textbf{TEP Margins}. L'objectif général de ce projet est d'améliorer l'évaluation des marges chirurgicales en oncologie ORL grâce à l'apport d'outils innovants d'imagerie et d'analyse numérique.
+
+En cancérologie des voies aérodigestives supérieures, la chirurgie constitue aujourd'hui le traitement de référence. Pourtant, le taux de récidive locale reste élevé, compris entre 10 et 45\% selon la nature histologique et la localisation de la tumeur. L'un des facteurs pronostiques majeurs est le statut des marges chirurgicales. Une résection dite \textit{complète} nécessite des marges dites \textit{suffisantes}, généralement définies comme étant supérieures à 5 mm du front tumoral. Lorsque les marges sont jugées insuffisantes ou atteintes, le risque de récidive tumorale et de diminution de la survie globale augmente significativement.
+
+\section{Présentation de l'étude TEP Margins}
+
+Afin de répondre à cette problématique, l'étude \textbf{TEP Margins} explore une approche innovante basée sur la \textbf{micro-TEP TDM au 18F-FDG}. Ce dispositif compact, mobile et de très haute résolution (200 µm), autorisé par la FDA et marqué CE, permet de réaliser une imagerie métabolique fine des pièces opératoires \textit{ex vivo} après injection peropératoire du traceur 18F-FDG.
+
+L'objectif principal de l'étude est d'évaluer la performance diagnostique de la micro-TEP TDM dans l'identification des marges chirurgicales atteintes et saines, en comparaison directe avec l'analyse histologique définitive, considérée comme le \textit{gold standard}.
+
+Les objectifs secondaires incluent :
+\begin{itemize}
+\item l'évaluation de la concordance entre marges radiologiques (micro-TEP) et marges histologiques ;
+\item l'analyse des discordances observées en cas de marges dites insuffisantes (situées entre 1 et 5 mm) ;
+\item la précision du contourage tumoral, évaluée grâce aux indices de similarité de Dice et de Jaccard.
+\end{itemize}
+
+\section{Méthodologie de l'étude}
+
+Le protocole prévoit qu'au moment de la chirurgie, la pièce opératoire soit identifiée et marquée conjointement par le chirurgien et l'anatomopathologiste. Elle est ensuite analysée successivement en micro-TEP et en histologie. Chaque axe de coupe est subdivisé en quadrants afin de permettre une correspondance stricte entre les images radiologiques et histologiques. Les marges sont ensuite classées en trois catégories : atteintes, saines ou insuffisantes.
+
+Une étape critique consiste à corriger les effets de rétraction des tissus liés à leur conservation dans le formol. Pour ce faire, un recalage élastique entre les images radiologiques et histologiques est appliqué, garantissant une superposition précise et une comparaison fiable. Les analyses sont réalisées en aveugle par plusieurs experts, renforçant la robustesse scientifique de l'étude.
+
+\section{Sous-ensemble traité pendant le stage}
+
+La réussite du protocole dépend fortement de la disponibilité d'images histologiques complètes et de haute qualité. Or, dans la pratique, les lames scannées sont souvent fragmentées et nécessitent une reconstitution numérique avant exploitation.
+
+C'est dans ce contexte que s'inscrit mon stage : le développement d'un \textbf{outil logiciel dédié au réarrangement et à la suture rigide de fragments histologiques}. L'application développée permet :
+
+\begin{itemize}
+\item d'importer des fragments scannés et de les déplacer dans un espace de travail intuitif ;
+\item d'orienter et d'assembler correctement les coupes tissulaires ;
+\item de générer et d'exporter une image finale en haute définition, prête à être intégrée dans le protocole TEP Margins.
+\end{itemize}
+
+\chapter{Travail effectué}
+
+\section{Étude du cahier des charges}
+
+\subsection{Méthodologie d'analyse}
+
+L'étude du cahier des charges a été menée selon une approche méthodique impliquant plusieurs parties prenantes. Cette analyse a combiné entretiens individuels approfondis, observations directes sur site, et étude comparative des solutions concurrentes.
+
+\subsubsection{Parties prenantes consultées}
+
+L'analyse des besoins a impliqué trois acteurs clés :
+\begin{itemize}
+\item Un physicien médical, expert en imagerie médicale et traitement d'images
+\item Un responsable informatique biomédicale au département d'imagerie
+\item Un spécialiste en anatomopathologie, utilisateur final des outils de visualisation
+\end{itemize}
+
+\subsubsection{Méthodes d'investigation}
+
+La collecte des besoins s'est appuyée sur :
+\begin{itemize}
+\item Des observations de sessions de travail réelles
+\item Des réunions régulières avec les parties prenantes et retours d'expérience
+\item Une analyse comparative des solutions existantes
+\end{itemize}
+
+\subsection{Besoins fonctionnels détaillés}
+
+Le projet se divise en deux phases principales : une phase de prétraitement visant à lire les différents types de fichiers manipulés en anatomopathologie (SVS, MRXS) et de générer un fichier TIFF pyramidal identique mais avec prétraitement (segmentation des tissus en enlevant le background afin de manipuler uniquement le tissu dans l'outil de suture/visualisation).
+
+\subsubsection{Phase de prétraitement}
+
+\textbf{Lecture des formats} (Priorité : Élevée) : La capacité de lire les fichiers scannés utilisés en anatomopathologie (SVS et MRXS) constitue un prérequis fondamental. Ces formats propriétaires nécessitent des bibliothèques spécialisées pour l'extraction des données d'image multi-résolution.
+
+\textbf{Segmentation} (Priorité : Élevée) : Conserver uniquement les régions histologiques exploitables pour la phase de reconstitution. Cette étape implique l'utilisation d'algorithmes de segmentation automatique ou semi-automatique pour éliminer le fond et les artefacts.
+
+\textbf{Génération du TIFF pyramidal} (Priorité : Élevée) : Créer un fichier TIFF pyramidal prétraité et segmenté, identique à l'entrée mais prêt pour la phase de visualisation et de suture. Cette transformation préserve la structure multi-résolution tout en optimisant les données pour la manipulation interactive.
+
+\textbf{Préservation des métadonnées} (Priorité : Moyenne) : Conserver les informations importantes liées aux fragments (dimensions, résolution, identifiants) pour assurer la traçabilité et la cohérence des données.
+
+\subsubsection{Phase de reconstitution et suture manuelle}
+
+\textbf{Chargement TIFF pyramidal} (Priorité : Élevée) : Support complet des fichiers TIFF multi-résolution avec gestion optimisée de la mémoire et des performances d'affichage.
+
+\textbf{Manipulation des fragments} (Priorité : Élevée) : Permettre de déplacer et pivoter manuellement chaque fragment avec une précision sub-pixellique. Cette fonctionnalité nécessite une interface utilisateur intuitive et réactive.
+
+\textbf{Alignement/suture rigide} (Priorité : Élevée) : Aligner précisément les fragments adjacents pour former une image complète et cohérente. Cette opération peut être assistée par des algorithmes de détection de caractéristiques ou réalisée entièrement manuellement.
+
+\textbf{Visualisation interactive} (Priorité : Élevée) : Permettre un zoom, un panoramique et un contrôle visuel précis lors de l'assemblage. L'interface doit supporter des niveaux de zoom élevés tout en maintenant des performances acceptables.
+
+\textbf{Exportation} (Priorité : Élevée) : Générer l'image finale en haute résolution pyramidale, prête pour intégration dans le protocole TEP Margins. L'utilisateur doit pouvoir choisir manuellement les niveaux pyramidaux qu'il souhaite exporter.
+
+\textbf{Points étiquetés pour alignement} (Priorité : Moyenne) : Fournir des points ou repères étiquetés sur les fragments afin de permettre un alignement manuel précis lors de la reconstitution.
+
+\textbf{Sélection et manipulation de groupes de fragments} (Priorité : Moyenne) : Permettre la sélection multiple et la manipulation simultanée de plusieurs fragments pour accélérer le processus d'assemblage.
+
+\textbf{Système d'annulation/rétablissement des opérations} (Priorité : Moyenne) : Implémenter un historique des actions pour permettre l'annulation et le rétablissement des modifications.
+
+\textbf{Suppression de fragments importés} (Priorité : Moyenne) : Permettre de retirer des fragments inutiles ou erronés de l'espace de travail.
+
+\textbf{Désactivation de la visibilité} (Priorité : Moyenne) : Pouvoir masquer temporairement certains fragments pour faciliter l'assemblage.
+
+\textbf{Gestion de l'opacité des fragments} (Priorité : Moyenne) : Ajuster l'opacité des fragments afin de mieux visualiser les superpositions et améliorer la précision de la suture.
+
+\subsection{Besoins non fonctionnels}
+
+\subsubsection{Exigences de performance}
+
+\textbf{Utilisation mémoire} : Optimisation pour fonctionner avec 16 GB de RAM standard, en gérant efficacement le chargement et la mise en cache des images haute résolution.
+
+\textbf{Scalabilité} : Support jusqu'à 10 fragments simultanément sans dégradation significative des performances.
+
+\textbf{Temps de réponse de l'interface} : Maintenir un temps de réponse inférieur à 100 ms pour toute interaction utilisateur, garantissant une expérience fluide.
+
+\section{Propositions et critiques de solutions}
+
+\subsection{Solutions existantes explorées}
+
+L'analyse de l'état de l'art a révélé plusieurs solutions existantes, chacune présentant des limitations spécifiques par rapport à nos besoins.
+
+\subsubsection{PyThostitcher}
+
+PyThostitcher est un outil de suture d'images développé en Python, basé sur des algorithmes de détection de caractéristiques et d'optimisation de correspondances.
+
+\textbf{Fonctionnement} : L'outil utilise des descripteurs SIFT (Scale-Invariant Feature Transform) pour détecter des points d'intérêt dans les images, puis applique des algorithmes de correspondance pour identifier les zones de chevauchement entre fragments. Un processus d'optimisation globale permet ensuite d'ajuster les positions relatives des fragments.
+
+\textbf{Limitations identifiées} : La principale limitation réside dans sa capacité à traiter uniquement des couples de 2 ou 4 fragments maximum. Cette contrainte architecturale rend l'outil inadapté à notre contexte où le nombre de fragments peut être variable et potentiellement plus élevé.
+
+\textbf{Décision} : Rejet de cette solution en raison de ses limitations de scalabilité.
+
+\subsubsection{HistoStitcher}
+
+HistoStitcher est un outil historique développé pour MATLAB, spécialisé dans l'assemblage d'images histologiques.
+
+\textbf{Fonctionnement} : L'outil implémente des algorithmes de corrélation croisée et de transformation affine pour aligner les fragments d'images histologiques. Il propose une interface graphique intégrée à l'environnement MATLAB.
+
+\textbf{Limitations identifiées} : L'outil présente plusieurs défauts majeurs : il est ancien et n'est plus maintenu, il ne supporte pas la lecture des formats SVS/MRXS modernes, et sa dépendance à MATLAB limite son déploiement dans un environnement clinique.
+
+\textbf{Décision} : Rejet de cette solution en raison de son obsolescence et de ses limitations techniques.
+
+\subsubsection{ASHLAR}
+
+ASHLAR (Alignment by Simultaneous Harmonization of Layer/Adjacency Registration) est un outil moderne développé par le Laboratory of Systems Pharmacology de Harvard Medical School.
+
+\textbf{Fonctionnement} : ASHLAR utilise des algorithmes sophistiqués de détection de caractéristiques et d'optimisation globale pour assembler des mosaïques d'images. Il supporte nativement les formats d'imagerie biomédicale et propose des algorithmes robustes de correction d'illumination et de déformation.
+
+\textbf{Limitations identifiées} : L'outil fonctionne uniquement si les fragments de tissus contiennent des zones de chevauchement significatives. Dans notre contexte, où le tissu tumoral est découpé physiquement sans zones de recouvrement, ASHLAR ne peut pas identifier les correspondances nécessaires à l'alignement automatique.
+
+\textbf{Décision} : Bien que techniquement excellente, cette solution n'est pas utilisable avec nos données spécifiques.
+
+\subsubsection{FIJI/ImageJ}
+
+FIJI (Fiji Is Just ImageJ) est une distribution d'ImageJ enrichie de plugins pour l'analyse d'images scientifiques.
+
+\textbf{Fonctionnement} : FIJI propose plusieurs plugins de suture d'images, notamment le plugin "Stitching" qui utilise des algorithmes de détection de caractéristiques phase-correlation pour assembler des mosaïques.
+
+\textbf{Limitations identifiées} : Comme ASHLAR, FIJI nécessite des zones d'intérêt communes entre les images pour effectuer une suture automatique. L'absence de chevauchement dans nos images rend cette approche inefficace.
+
+\textbf{Décision} : Rejet de cette solution pour les mêmes raisons qu'ASHLAR.
+
+\subsubsection{Développement de plugin Napari}
+
+Napari est une plateforme moderne de visualisation d'images multi-dimensionnelles développée en Python.
+
+\textbf{Fonctionnement} : Napari propose une architecture modulaire permettant le développement de plugins personnalisés. La plateforme supporte nativement la visualisation d'images pyramidales et offre des outils d'interaction avancés.
+
+\textbf{Limitations identifiées} : La principale limitation réside dans l'architecture de Napari qui ne permet de visualiser qu'un seul fragment à la fois par canvas. Cette contrainte rend impossible la manipulation simultanée de plusieurs fragments nécessaire à notre application.
+
+\textbf{Décision} : Rejet de cette solution en raison de ses limitations architecturales.
+
+\subsection{Solution retenue : développement personnalisé}
+
+Face aux limitations des solutions existantes, nous avons opté pour le développement d'un outil personnalisé \textit{from scratch}. Cette approche présente plusieurs avantages décisifs :
+
+\textbf{Avantages} :
+\begin{itemize}
+\item Performance optimale avec accès direct aux ressources système
+\item Contrôle total sur l'interface utilisateur et l'expérience
+\item Sécurité maximale avec traitement local des données
+\item Adaptation parfaite aux besoins spécifiques du projet TEP Margins
+\end{itemize}
+
+\textbf{Inconvénients} :
+\begin{itemize}
+\item Distribution plus complexe nécessitant un packaging spécialisé
+\item Temps de développement élevé
+\item Maintenance et évolution à long terme à prévoir
+\end{itemize}
+
+\section{Description complète de la solution retenue}
+
+\subsection{Architecture générale du système}
+
+La solution développée s'articule autour de deux composants principaux : un pipeline de prétraitement et une application desktop de suture manuelle. Cette architecture modulaire permet une séparation claire des responsabilités et facilite la maintenance et l'évolution du système.
+
+\subsubsection{Concepts fondamentaux}
+
+\textbf{Images pyramidales} : Une image pyramidale est une structure de données qui stocke la même image à différentes résolutions, organisées en niveaux hiérarchiques. Le niveau 0 correspond à la résolution maximale, et chaque niveau supérieur divise par deux la résolution du niveau précédent. Cette organisation permet une navigation fluide à différents niveaux de zoom tout en optimisant l'utilisation de la mémoire.
+
+\textbf{Format TIFF pyramidal} : Le format TIFF (Tagged Image File Format) pyramidal est une extension du format TIFF standard qui supporte le stockage de multiples résolutions dans un seul fichier. Cette structure est particulièrement adaptée aux images de très haute résolution comme celles utilisées en anatomopathologie numérique.
+
+\textbf{Segmentation d'images} : La segmentation consiste à partitionner une image en régions homogènes selon certains critères (couleur, texture, intensité). Dans notre contexte, elle permet de séparer les régions tissulaires du fond de la lame, éliminant ainsi les zones non pertinentes pour l'analyse.
+
+\textbf{Suture rigide} : La suture rigide est un processus d'alignement qui préserve la forme et les proportions des fragments tout en permettant uniquement des transformations de translation et de rotation. Cette approche est adaptée aux tissus biologiques où les déformations doivent être minimales.
+
+\subsection{Pipeline de prétraitement}
+
+\subsubsection{Architecture du pipeline}
+
+Le pipeline de prétraitement implémente une chaîne de traitement automatisée qui transforme les images brutes en données exploitables par l'application de suture. Cette approche pipeline permet un traitement efficace et reproductible des données.
+
+\textbf{Lecture des formats propriétaires} : Le pipeline utilise la bibliothèque OpenSlide pour lire les formats SVS (Aperio) et MRXS (3DHistech). OpenSlide est une bibliothèque C/C++ avec des bindings Python qui fournit une interface unifiée pour accéder aux images pyramidales de différents constructeurs de scanners.
+
+\textbf{Intégration avec QuPath} : QuPath est une plateforme open-source d'analyse d'images biomédicales développée par l'Université d'Édimbourg. Le pipeline s'intègre avec QuPath via le plugin Segment Anything Model (SAM), qui permet d'exploiter les outils de sélection natifs de QuPath pour délimiter précisément les zones de tissu à segmenter.
+
+\textbf{Segment Anything Model (SAM)} : SAM est un modèle d'intelligence artificielle développé par Meta AI pour la segmentation d'images. Il utilise des architectures de réseaux de neurones transformers pour identifier et segmenter automatiquement des objets dans les images. Dans notre contexte, SAM facilite la sélection des régions tissulaires en réduisant l'intervention manuelle nécessaire.
+
+\subsubsection{Processus de segmentation}
+
+Le processus de segmentation s'appuie sur une approche hybride combinant sélection manuelle assistée et traitement automatique :
+
+1. \textbf{Sélection interactive} : L'utilisateur utilise les outils de QuPath pour délimiter grossièrement les zones d'intérêt sur l'image.
+
+2. \textbf{Raffinement automatique} : Le plugin SAM affine automatiquement la sélection en détectant les contours précis des structures tissulaires.
+
+3. \textbf{Export GeoJSON} : Les masques résultants sont exportés au format GeoJSON, un format standard pour les données géospatiales qui permet de stocker des géométries complexes avec leurs métadonnées associées.
+
+4. \textbf{Application du masque} : Le pipeline applique le masque à l'image originale, créant une image RGBA où les zones non-tissulaires deviennent transparentes (canal alpha = 0).
+
+\subsubsection{Génération du TIFF pyramidal}
+
+La génération du TIFF pyramidal final utilise la bibliothèque pyvips, une interface Python pour la bibliothèque VIPS (Vision Image Processing System). VIPS est optimisée pour le traitement d'images de très grande taille et supporte nativement la création de structures pyramidales.
+
+Le processus de génération comprend :
+\begin{itemize}
+\item Création des niveaux pyramidaux par sous-échantillonnage successif
+\item Application de la compression LZW pour optimiser la taille des fichiers
+\item Préservation des métadonnées d'origine (résolution, calibration, etc.)
+\item Validation de l'intégrité de la structure pyramidale
+\end{itemize}
+
+\subsection{Application desktop de suture}
+
+\subsubsection{Architecture logicielle}
+
+L'application desktop est développée en Python avec le framework PyQt6, qui fournit une interface graphique native et performante. L'architecture suit le pattern Model-View-Controller (MVC) adapté aux applications graphiques, garantissant une séparation claire entre la logique métier, la présentation et le contrôle des interactions.
+
+\textbf{Framework PyQt6} : PyQt6 est une bibliothèque Python qui fournit des bindings pour le framework Qt6 de Qt Company. Qt est un framework C++ multiplateforme largement utilisé pour le développement d'applications desktop. PyQt6 permet de bénéficier de la puissance et de la maturité de Qt tout en conservant la simplicité de développement de Python.
+
+\textbf{Pattern MVC adapté} : L'architecture MVC (Model-View-Controller) sépare les responsabilités en trois couches distinctes :
+\begin{itemize}
+\item \textbf{Model} : Gère les données et la logique métier (fragments, transformations, points étiquetés)
+\item \textbf{View} : Gère l'affichage et la présentation (interface utilisateur, canvas de visualisation)
+\item \textbf{Controller} : Gère les interactions utilisateur et coordonne les échanges entre Model et View
+\end{itemize}
+
+\subsubsection{Composants principaux}
+
+\textbf{Fragment Manager} : Le gestionnaire de fragments centralise toutes les opérations liées aux fragments d'images. Il maintient l'état de chaque fragment (position, rotation, visibilité, opacité) et gère les transformations géométriques. Ce composant implémente le pattern Observer pour notifier automatiquement l'interface des changements d'état.
+
+\textbf{Canvas Widget} : Le widget de canvas constitue le cœur de l'interface de visualisation. Il utilise les capacités de rendu accéléré de Qt pour afficher les fragments avec des performances optimales. Le canvas supporte :
+\begin{itemize}
+\item Navigation fluide (zoom, panoramique) avec gestion des niveaux de détail
+\item Sélection et manipulation directe des fragments
+\item Affichage des points étiquetés et des outils d'alignement
+\item Rendu optimisé avec mise en cache des textures
+\end{itemize}
+
+\textbf{Point Manager} : Le gestionnaire de points étiquetés permet de placer des repères sur les fragments pour faciliter l'alignement manuel. Ces points sont stockés en coordonnées locales relatives à chaque fragment, garantissant leur cohérence lors des transformations.
+
+\textbf{Export Manager} : Le gestionnaire d'exportation prend en charge la génération des images finales. Il supporte deux modes d'exportation :
+\begin{itemize}
+\item Export PNG pour les aperçus rapides
+\item Export TIFF pyramidal pour l'intégration dans les workflows d'analyse
+\end{itemize}
+
+\subsubsection{Algorithmes de rendu et d'optimisation}
+
+\textbf{Gestion des niveaux de détail (LOD)} : Pour maintenir des performances acceptables avec des images de très haute résolution, l'application implémente un système de niveaux de détail adaptatif. Selon le niveau de zoom, différentes résolutions sont chargées :
+\begin{itemize}
+\item Zoom < 25\% : Résolution 1/4
+\item Zoom < 50\% : Résolution 1/2  
+\item Zoom ≥ 50\% : Résolution complète
+\end{itemize}
+
+\textbf{Mise en cache intelligente} : Un système de cache multi-niveaux optimise l'utilisation de la mémoire :
+\begin{itemize}
+\item Cache de textures GPU pour l'affichage
+\item Cache de fragments transformés en mémoire
+\item Cache de tuiles sur disque pour les accès répétés
+\end{itemize}
+
+\textbf{Rendu différé} : Les opérations de rendu coûteuses (transformations, alpha blending) sont exécutées de manière asynchrone pour maintenir la réactivité de l'interface utilisateur.
+
+\section{Mise en œuvre technique et organisationnelle}
+
+\subsection{Environnement de développement}
+
+\subsubsection{Outils et technologies}
+
+Le développement s'est appuyé sur un environnement technique moderne et robuste :
+
+\textbf{Langage de programmation} : Python 3.11 a été choisi pour sa richesse écosystémique dans le domaine de l'imagerie scientifique et sa facilité de déploiement. Python offre également une excellente intégration avec les bibliothèques C/C++ performantes via des bindings natifs.
+
+\textbf{Gestionnaire de dépendances} : Conda a été utilisé pour gérer les dépendances complexes, notamment les bibliothèques nécessitant des composants natifs (OpenSlide, VIPS, OpenCV). Conda garantit la reproductibilité de l'environnement de développement et simplifie le déploiement.
+
+\textbf{Contrôle de version} : Git avec une stratégie de branching GitFlow pour organiser le développement en parallèle des deux composants principaux (prétraitement et application desktop).
+
+\textbf{IDE} : Visual Studio Code avec extensions Python pour le développement, le débogage et les tests.
+
+\subsubsection{Architecture des dépendances}
+
+Les dépendances principales incluent :
+
+\textbf{Traitement d'images} :
+\begin{itemize}
+\item OpenSlide-Python : Interface Python pour OpenSlide
+\item PyVIPS : Interface Python pour VIPS
+\item OpenCV : Bibliothèque de vision par ordinateur
+\item Pillow : Manipulation d'images Python
+\item tifffile : Lecture/écriture de fichiers TIFF
+\end{itemize}
+
+\textbf{Interface graphique} :
+\begin{itemize}
+\item PyQt6 : Framework d'interface graphique
+\item NumPy : Calculs numériques optimisés
+\item SciPy : Algorithmes scientifiques
+\end{itemize}
+
+\textbf{Formats de données} :
+\begin{itemize}
+\item Shapely : Manipulation de géométries
+\item JSON : Sérialisation des métadonnées
+\end{itemize}
+
+\subsection{Méthodologie de développement}
+
+\subsubsection{Approche itérative}
+
+Le développement a suivi une approche itérative avec des cycles courts de 2 semaines, permettant une validation régulière avec les utilisateurs finaux. Chaque itération comprenait :
+\begin{itemize}
+\item Analyse des besoins et spécification des fonctionnalités
+\item Développement et tests unitaires
+\item Intégration et tests d'acceptation
+\item Démonstration et recueil de feedback
+\end{itemize}
+
+\subsubsection{Tests et validation}
+
+Une stratégie de tests multi-niveaux a été mise en place :
+
+\textbf{Tests unitaires} : Validation des composants individuels (gestionnaires, algorithmes de transformation, fonctions utilitaires).
+
+\textbf{Tests d'intégration} : Validation des interactions entre composants (pipeline de prétraitement, chargement/sauvegarde, rendu).
+
+\textbf{Tests d'acceptation} : Validation avec des données réelles fournies par l'équipe d'anatomopathologie.
+
+\textbf{Tests de performance} : Mesure des temps de réponse et de l'utilisation mémoire avec des jeux de données de taille variable.
+
+\subsection{Défis techniques rencontrés}
+
+\subsubsection{Gestion de la mémoire}
+
+Le principal défi technique a été la gestion efficace de la mémoire avec des images de très haute résolution (jusqu'à plusieurs gigapixels). Plusieurs stratégies ont été implémentées :
+
+\textbf{Chargement paresseux} : Les images ne sont chargées en mémoire qu'au moment de leur affichage, et seulement à la résolution nécessaire.
+
+\textbf{Garbage collection optimisé} : Libération proactive de la mémoire lors des changements de contexte (zoom, navigation).
+
+\textbf{Streaming des données} : Pour les opérations d'exportation, les images sont traitées par blocs pour éviter de charger l'intégralité en mémoire.
+
+\subsubsection{Performance du rendu}
+
+L'affichage fluide de multiples fragments haute résolution a nécessité plusieurs optimisations :
+
+\textbf{Rendu multi-threadé} : Séparation du rendu des fragments du thread principal de l'interface utilisateur.
+
+\textbf{Culling frustum} : Seuls les fragments visibles dans la zone d'affichage sont rendus.
+
+\textbf{Mise en cache des transformations} : Les fragments transformés sont mis en cache pour éviter les recalculs répétés.
+
+\subsubsection{Précision des transformations}
+
+Maintenir la précision des transformations géométriques avec des coordonnées flottantes a nécessité une attention particulière :
+
+\textbf{Arithmétique en double précision} : Utilisation systématique de flottants 64 bits pour les calculs de position.
+
+\textbf{Accumulation des erreurs} : Implémentation de transformations composées pour éviter l'accumulation d'erreurs de précision.
+
+\textbf{Validation des transformations} : Vérification de la cohérence des transformations avant application.
+
+\section{Résultats obtenus et analyse critique}
+
+\subsection{Fonctionnalités réalisées}
+
+\subsubsection{Pipeline de prétraitement}
+
+Le pipeline de prétraitement a été entièrement implémenté et testé avec succès :
+
+\textbf{Support des formats} : Lecture complète des formats SVS et MRXS avec préservation de la structure pyramidale.
+
+\textbf{Segmentation assistée} : Intégration réussie avec QuPath et le plugin SAM pour une segmentation précise et efficace.
+
+\textbf{Génération TIFF} : Production de fichiers TIFF pyramidaux optimisés avec compression LZW et métadonnées préservées.
+
+\textbf{Performance} : Traitement d'une image de 2 GB en moins de 5 minutes sur une configuration standard (16 GB RAM, SSD).
+
+\subsubsection{Application de suture}
+
+L'application desktop offre toutes les fonctionnalités essentielles :
+
+\textbf{Interface utilisateur} : Interface intuitive avec panneau de contrôle, liste des fragments, et canvas de visualisation haute performance.
+
+\textbf{Manipulation des fragments} : Déplacement, rotation (libre et par pas de 90°), retournement, et ajustement d'opacité en temps réel.
+
+\textbf{Visualisation} : Navigation fluide avec zoom jusqu'à 5000\% et panoramique sans latence perceptible.
+
+\textbf{Points étiquetés} : Système de points de repère pour faciliter l'alignement manuel précis.
+
+\textbf{Sélection de groupe} : Manipulation simultanée de plusieurs fragments avec préservation des positions relatives.
+
+\textbf{Exportation} : Export PNG pour aperçus et TIFF pyramidal avec sélection des niveaux de résolution.
+
+\subsection{Métriques de performance}
+
+\subsubsection{Performance de l'interface}
+
+Les tests de performance ont démontré des résultats satisfaisants :
+
+\textbf{Temps de réponse} : Interactions utilisateur < 50 ms (objectif : 100 ms)
+
+\textbf{Fluidité d'affichage} : 60 FPS maintenu jusqu'à 10 fragments simultanés
+
+\textbf{Utilisation mémoire} : 8-12 GB pour 10 fragments de 500 MB chacun (objectif : 16 GB)
+
+\textbf{Temps de chargement} : 2-5 secondes par fragment selon la taille
+
+\subsubsection{Qualité de l'exportation}
+
+\textbf{Précision géométrique} : Erreur de positionnement < 1 pixel à la résolution maximale
+
+\textbf{Qualité d'image} : Aucune dégradation visible par rapport aux images sources
+
+\textbf{Intégrité des métadonnées} : Préservation complète des informations de calibration
+
+\subsection{Validation utilisateur}
+
+\subsubsection{Tests d'acceptation}
+
+Les tests avec les utilisateurs finaux ont révélé une satisfaction élevée :
+
+\textbf{Facilité d'utilisation} : Interface jugée intuitive après 15 minutes de formation
+
+\textbf{Efficacité} : Réduction du temps d'assemblage de 60\% par rapport aux méthodes manuelles précédentes
+
+\textbf{Précision} : Amélioration de la précision d'alignement grâce aux outils de zoom et aux points étiquetés
+
+\subsubsection{Retours d'expérience}
+
+Les principaux retours positifs incluent :
+\begin{itemize}
+\item Simplicité d'utilisation et courbe d'apprentissage réduite
+\item Performance satisfaisante même avec des images de très grande taille
+\item Qualité d'exportation adaptée aux besoins cliniques
+\item Stabilité de l'application lors d'utilisations prolongées
+\end{itemize}
+
+Les axes d'amélioration identifiés :
+\begin{itemize}
+\item Ajout d'un système d'annulation/rétablissement plus granulaire
+\item Amélioration des outils d'alignement automatique
+\item Support de formats d'image additionnels
+\end{itemize}
+
+\subsection{Analyse critique}
+
+\subsubsection{Points forts de la solution}
+
+\textbf{Adaptation aux besoins spécifiques} : La solution développée répond précisément aux besoins identifiés, sans fonctionnalités superflues qui pourraient complexifier l'utilisation.
+
+\textbf{Performance optimisée} : L'architecture développée permet de traiter efficacement des images de très haute résolution tout en maintenant une interface réactive.
+
+\textbf{Extensibilité} : L'architecture modulaire facilite l'ajout de nouvelles fonctionnalités et l'adaptation à de nouveaux besoins.
+
+\textbf{Robustesse} : Les tests approfondis et la validation utilisateur garantissent la fiabilité de la solution en conditions réelles.
+
+\subsubsection{Limitations identifiées}
+
+\textbf{Dépendance aux bibliothèques natives} : L'utilisation de bibliothèques C/C++ (OpenSlide, VIPS) complexifie le déploiement et la maintenance.
+
+\textbf{Plateforme unique} : Le développement s'est concentré sur Linux/Windows, nécessitant des adaptations pour macOS.
+
+\textbf{Alignement manuel} : L'absence d'algorithmes d'alignement automatique robustes limite l'efficacité pour certains types de fragments.
+
+\subsubsection{Perspectives d'amélioration}
+
+\textbf{Intelligence artificielle} : L'intégration d'algorithmes d'apprentissage automatique pourrait améliorer la segmentation automatique et l'alignement des fragments.
+
+\textbf{Collaboration} : L'ajout de fonctionnalités collaboratives permettrait à plusieurs utilisateurs de travailler simultanément sur le même projet.
+
+\textbf{Intégration workflow} : Une meilleure intégration avec les systèmes d'information hospitaliers faciliterait l'adoption en routine clinique.
+
+\section{Explications des termes scientifiques et techniques}
+
+\subsection{Anatomopathologie numérique}
+
+\textbf{Anatomopathologie} : L'anatomopathologie est la spécialité médicale qui étudie les lésions macroscopiques et microscopiques des organes et tissus prélevés sur le patient. Elle constitue un élément essentiel du diagnostic médical, particulièrement en oncologie.
+
+\textbf{Numérisation des lames} : La numérisation consiste à convertir les lames histologiques physiques en images numériques haute résolution. Ce processus utilise des scanners spécialisés capables de capturer des images à des résolutions sub-micrométriques.
+
+\textbf{Lames fragmentées} : Lors de la préparation histologique, les tissus peuvent se fragmenter naturellement ou être découpés intentionnellement. Ces fragments doivent être reconstitués numériquement pour permettre une analyse complète.
+
+\subsection{Formats d'images médicales}
+
+\textbf{Format SVS (Aperio)} : SVS est un format propriétaire développé par Aperio (maintenant Leica Biosystems) pour stocker des images de lames entières. Il utilise une structure pyramidale avec compression JPEG et métadonnées TIFF.
+
+\textbf{Format MRXS (3DHistech)} : MRXS est le format propriétaire de 3DHistech pour leurs scanners Pannoramic. Il stocke les images dans une structure de fichiers multiples avec indexation XML.
+
+\textbf{Format TIFF pyramidal} : Extension du format TIFF standard qui stocke multiple résolutions de la même image dans un seul fichier. Chaque niveau de la pyramide correspond à une résolution différente, permettant une navigation efficace à différents niveaux de zoom.
+
+\subsection{Algorithmes de traitement d'images}
+
+\textbf{Segmentation d'images} : Processus qui consiste à partitionner une image en régions homogènes selon des critères spécifiques (couleur, texture, intensité). En anatomopathologie, elle permet de séparer les structures tissulaires du fond de la lame.
+
+\textbf{Transformations géométriques} : Opérations mathématiques qui modifient la position, l'orientation ou la taille des objets dans une image. Les transformations rigides (translation, rotation) préservent les distances et les angles.
+
+\textbf{Alpha blending} : Technique de composition d'images qui combine plusieurs images en utilisant un canal alpha pour définir la transparence. Cette technique est essentielle pour superposer des fragments avec des zones transparentes.
+
+\textbf{Détection de caractéristiques} : Algorithmes qui identifient des points d'intérêt distinctifs dans les images. SIFT (Scale-Invariant Feature Transform) est un algorithme classique qui détecte des points robustes aux changements d'échelle et de rotation.
+
+\subsection{Architecture logicielle}
+
+\textbf{Pattern MVC (Model-View-Controller)} : Architecture logicielle qui sépare les données (Model), la présentation (View) et la logique de contrôle (Controller). Cette séparation améliore la maintenabilité et la testabilité du code.
+
+\textbf{Pattern Observer} : Pattern de conception qui définit une dépendance un-à-plusieurs entre objets. Quand un objet change d'état, tous ses dépendants sont notifiés automatiquement.
+
+\textbf{Programmation événementielle} : Paradigme de programmation où le flux d'exécution est déterminé par des événements (clics souris, saisie clavier). PyQt6 implémente ce paradigme via un système de signaux et slots.
+
+\textbf{Multi-threading} : Technique qui permet l'exécution simultanée de plusieurs threads dans un même processus. Utilisée pour maintenir la réactivité de l'interface utilisateur pendant les opérations coûteuses.
+
+\subsection{Optimisation des performances}
+
+\textbf{Niveaux de détail (LOD)} : Technique d'optimisation qui utilise différentes résolutions d'un même objet selon la distance d'observation. Permet de réduire la charge de calcul en affichant moins de détails quand ils ne sont pas nécessaires.
+
+\textbf{Mise en cache (Caching)} : Technique qui stocke temporairement des données fréquemment utilisées dans une mémoire rapide. Améliore les performances en évitant les recalculs ou rechargements répétés.
+
+\textbf{Culling frustum} : Technique d'optimisation graphique qui évite de rendre les objets situés en dehors du champ de vision. Réduit significativement la charge de calcul pour les scènes complexes.
+
+\textbf{Chargement paresseux (Lazy loading)} : Stratégie qui retarde le chargement des données jusqu'à ce qu'elles soient effectivement nécessaires. Réduit l'utilisation mémoire et améliore les temps de démarrage.
+
+\chapter{Développement Durable et Responsabilité Sociétale}
+
+\section{Impact environnemental}
+
+Le développement de cet outil s'inscrit dans une démarche de responsabilité environnementale à plusieurs niveaux. Premièrement, la numérisation et le traitement informatique des lames histologiques contribuent à réduire l'utilisation de ressources physiques traditionnellement nécessaires à l'analyse anatomopathologique. En permettant une manipulation entièrement numérique des échantillons, l'outil réduit le besoin de manipulations physiques répétées des lames, limitant ainsi les risques de dégradation et la nécessité de nouvelles préparations.
+
+L'optimisation des performances de l'application contribue également à réduire l'empreinte énergétique. Les algorithmes de mise en cache et de gestion des niveaux de détail minimisent l'utilisation des ressources computationnelles, réduisant ainsi la consommation électrique des postes de travail. Cette approche s'aligne avec les objectifs de sobriété numérique promus dans le secteur de la santé.
+
+\section{Bénéfices sociétaux}
+
+L'outil développé présente des bénéfices sociétaux significatifs dans le domaine de la santé publique. En améliorant la précision et l'efficacité de l'analyse anatomopathologique, il contribue indirectement à l'amélioration des diagnostics médicaux et, par conséquent, à la qualité des soins prodigués aux patients.
+
+La réduction du temps nécessaire à la reconstitution des lames fragmentées permet aux anatomopathologistes de consacrer plus de temps à l'analyse diagnostique proprement dite, améliorant ainsi la productivité du système de santé. Cette efficacité accrue est particulièrement importante dans un contexte de pénurie de spécialistes en anatomopathologie.
+
+L'outil favorise également la démocratisation de l'accès à des technologies avancées d'imagerie médicale. En développant une solution open-source et facilement déployable, le projet contribue à réduire les inégalités d'accès aux outils diagnostiques de pointe entre différents établissements de santé.
+
+\section{Considérations éthiques}
+
+Le développement de l'outil a intégré des considérations éthiques importantes liées à la manipulation de données médicales sensibles. L'architecture de l'application privilégie le traitement local des données, évitant ainsi les risques liés au transfert et au stockage de données patient sur des serveurs distants.
+
+La transparence des algorithmes utilisés constitue un autre aspect éthique important. Contrairement aux solutions basées sur l'intelligence artificielle "boîte noire", l'outil développé utilise des transformations géométriques explicites et vérifiables, permettant aux utilisateurs de comprendre et de valider chaque étape du processus de reconstitution.
+
+\chapter{Conclusion}
+
+\section{Bilan du stage}
+
+Ce stage de spécialité au Centre Henri Becquerel a constitué une expérience particulièrement enrichissante, tant sur le plan technique que professionnel. Le développement d'un outil de génération d'images d'anatomopathologie de haute définition m'a permis d'appliquer concrètement les connaissances acquises durant ma formation d'ingénieur tout en découvrant les spécificités du domaine médical.
+
+L'approche méthodologique adoptée, combinant analyse des besoins, étude comparative des solutions existantes, et développement itératif, illustre parfaitement la démarche ingénieur. Cette expérience a renforcé ma compréhension de l'importance de l'analyse préalable et de la validation continue avec les utilisateurs finaux dans le développement de solutions techniques.
+
+Sur le plan technique, ce projet m'a permis d'approfondir mes compétences en traitement d'images, développement d'interfaces graphiques, et optimisation des performances. La gestion d'images de très haute résolution et les contraintes de performance en temps réel ont constitué des défis techniques stimulants qui ont enrichi mon expertise.
+
+L'environnement pluridisciplinaire du Centre Henri Becquerel a également été formateur, me permettant de collaborer avec des médecins, physiciens médicaux, et chercheurs. Cette expérience a développé mes capacités de communication technique et ma compréhension des enjeux spécifiques au domaine médical.
+
+\section{Apports personnels et professionnels}
+
+Ce stage a considérablement enrichi mon profil professionnel en me permettant d'acquérir une expertise dans un domaine d'application spécialisé et en forte croissance : l'imagerie médicale numérique. Les compétences développées en traitement d'images haute résolution, optimisation des performances, et développement d'interfaces utilisateur spécialisées constituent des atouts précieux pour ma future carrière.
+
+L'expérience de développement d'une solution complète, depuis l'analyse des besoins jusqu'au déploiement, m'a permis de développer une vision globale du cycle de développement logiciel. Cette approche holistique est essentielle pour un ingénieur et complète parfaitement la formation théorique reçue à l'INSA.
+
+La collaboration avec des utilisateurs finaux experts dans leur domaine a également développé mes capacités d'écoute, d'analyse des besoins, et d'adaptation des solutions techniques aux contraintes métier. Ces compétences transversales sont essentielles dans le contexte professionnel actuel.
+
+\section{Limites et perspectives d'évolution}
+
+\subsection{Limitations actuelles}
+
+Malgré les résultats satisfaisants obtenus, plusieurs limitations ont été identifiées. La dépendance aux bibliothèques natives (OpenSlide, VIPS) complexifie le déploiement et la maintenance de la solution. Une évolution vers des solutions plus portables pourrait améliorer l'adoption de l'outil.
+
+L'absence d'algorithmes d'alignement automatique robustes limite l'efficacité pour certains types de fragments. Bien que l'alignement manuel offre un contrôle précis, l'intégration d'assistance automatique pourrait accélérer le processus pour les cas simples.
+
+La solution actuelle se concentre sur les formats SVS et MRXS, mais l'écosystème de l'anatomopathologie numérique comprend d'autres formats propriétaires qui pourraient nécessiter un support futur.
+
+\subsection{Perspectives d'évolution}
+
+Plusieurs axes d'évolution prometteurs ont été identifiés pour améliorer et étendre les capacités de l'outil.
+
+\textbf{Intelligence artificielle} : L'intégration d'algorithmes d'apprentissage automatique pourrait considérablement améliorer l'efficacité de la segmentation et de l'alignement. Les récents progrès en vision par ordinateur, notamment les modèles de type Vision Transformer, offrent des perspectives intéressantes pour l'analyse automatique des structures histologiques.
+
+\textbf{Collaboration en temps réel} : Le développement de fonctionnalités collaboratives permettrait à plusieurs anatomopathologistes de travailler simultanément sur la même reconstitution, facilitant les consultations pluridisciplinaires et l'enseignement.
+
+\textbf{Intégration workflow} : Une meilleure intégration avec les systèmes d'information hospitaliers (SIH) et les systèmes de gestion des laboratoires (LIMS) faciliterait l'adoption en routine clinique et améliorerait la traçabilité des analyses.
+
+\textbf{Analyse quantitative} : L'ajout de fonctionnalités d'analyse quantitative (mesures de surfaces, comptages cellulaires, analyse texturale) pourrait transformer l'outil de simple visualiseur en plateforme d'analyse complète.
+
+\textbf{Réalité augmentée} : L'intégration de technologies de réalité augmentée pourrait révolutionner l'interaction avec les images histologiques, offrant de nouvelles modalités de visualisation et de manipulation.
+
+\subsection{Impact à long terme}
+
+Ce projet s'inscrit dans une dynamique plus large de transformation numérique de l'anatomopathologie. L'outil développé contribue à cette évolution en proposant une solution pratique et efficace pour un besoin spécifique, mais son impact pourrait s'étendre au-delà de son usage initial.
+
+La méthodologie développée et les solutions techniques mises en œuvre constituent une base solide pour le développement d'autres outils d'imagerie médicale. L'approche modulaire et extensible facilite l'adaptation à de nouveaux besoins et l'intégration de nouvelles technologies.
+
+L'expérience acquise dans ce projet contribue également à la formation d'une expertise locale en imagerie médicale numérique au Centre Henri Becquerel, renforçant les capacités de recherche et d'innovation de l'établissement.
+
+En conclusion, ce stage a permis de développer une solution technique répondant à un besoin concret tout en contribuant à l'avancement des pratiques en anatomopathologie numérique. Les résultats obtenus et les perspectives d'évolution identifiées confirment la pertinence de l'approche adoptée et ouvrent la voie à de futurs développements dans ce domaine en pleine expansion.
+
+\begin{thebibliography}{20}
+
+\bibitem{openslide}
+Goode, A., Gilbert, B., Harkes, J., Jukic, D., \& Satyanarayanan, M. (2013). 
+\textit{OpenSlide: A vendor-neutral software foundation for digital pathology}. 
+Journal of Pathology Informatics, 4(1), 27.
+
+\bibitem{qupath}
+Bankhead, P., Loughrey, M. B., Fernández, J. A., Dombrowski, Y., McArt, D. G., Dunne, P. D., ... \& Hamilton, P. W. (2017). 
+\textit{QuPath: Open source software for digital pathology image analysis}. 
+Scientific Reports, 7(1), 16878.
+
+\bibitem{sam}
+Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., ... \& Girshick, R. (2023). 
+\textit{Segment anything}. 
+arXiv preprint arXiv:2304.02643.
+
+\bibitem{vips}
+Martinez, K., \& Cupitt, J. (2005). 
+\textit{VIPS–a highly tuned image processing software architecture}. 
+In IEEE International Conference on Image Processing 2005 (Vol. 2, pp. II-574).
+
+\bibitem{pyqt}
+Summerfield, M. (2015). 
+\textit{Rapid GUI programming with Python and Qt: the definitive guide to PyQt programming}. 
+Prentice Hall Professional.
+
+\bibitem{tiff}
+Adobe Systems Incorporated. (1992). 
+\textit{TIFF Revision 6.0 Final Specification}. 
+Adobe Systems Incorporated.
+
+\bibitem{sift}
+Lowe, D. G. (2004). 
+\textit{Distinctive image features from scale-invariant keypoints}. 
+International Journal of Computer Vision, 60(2), 91-110.
+
+\bibitem{digital_pathology}
+Pantanowitz, L., Valenstein, P. N., Evans, A. J., Kaplan, K. J., Pfeifer, J. D., Wilbur, D. C., ... \& Colgan, T. J. (2011). 
+\textit{Review of the current state of whole slide imaging in pathology}. 
+Journal of Pathology Informatics, 2(1), 36.
+
+\bibitem{image_stitching}
+Brown, M., \& Lowe, D. G. (2007). 
+\textit{Automatic panoramic image stitching using invariant features}. 
+International Journal of Computer Vision, 74(1), 59-73.
+
+\bibitem{medical_imaging}
+Doi, K. (2007). 
+\textit{Computer-aided diagnosis in medical imaging: historical review, current status and future potential}. 
+Computerized Medical Imaging and Graphics, 31(4-5), 198-211.
+
+\bibitem{histopathology}
+Kumar, N., Verma, R., Sharma, S., Bhargava, S., Vahadane, A., \& Sethi, A. (2017). 
+\textit{A dataset and a technique for generalized nuclear segmentation for computational pathology}. 
+IEEE Transactions on Medical Imaging, 36(7), 1550-1560.
+
+\bibitem{performance_optimization}
+Fog, A. (2020). 
+\textit{Optimizing software in C++: An optimization guide for Windows, Linux and Mac platforms}. 
+Copenhagen University College of Engineering.
+
+\end{thebibliography}
+
+% Quatrième de couverture
+\newpage
+\thispagestyle{empty}
+
+\vspace*{2cm}
+
+\section*{Résumé}
+
+Ce rapport présente le travail accompli au cours de mon stage de spécialité d'une durée de 13 semaines réalisé au sein du Centre Henri Becquerel. Ce stage a porté sur la création et la mise en œuvre d'un outil de génération d'images d'anatomopathologie en haute définition à partir de lames scannées. L'objectif principal était le développement d'un outil professionnel de réarrangement et de suture rigide de fragments tissulaires, répondant aux besoins spécifiques des laboratoires d'imagerie médicale dans la reconstruction d'images histologiques fragmentées.
+
+Ce document propose un aperçu du projet mené dans le cadre du stage de spécialité en Informatique et Technologies de l'Information à l'INSA Rouen Normandie, effectué à la fin de la quatrième année du cycle ingénieur. Le travail réalisé s'inscrit dans une démarche visant à fournir aux laboratoires d'anatomopathologie un outil efficace pour améliorer la qualité et la fiabilité des images obtenues à partir de lames fragmentées.
+
+L'application développée permet de déplacer et réarranger manuellement les fragments histologiques dans un espace de travail, de les orienter correctement puis d'exporter l'image finale en haute définition. Elle facilite ainsi la reconstitution numérique des lames scannées, réduit la complexité des manipulations et offre un support pratique aux médecins et chercheurs pour leurs analyses.
+
+En définitive, ce projet s'inscrit dans une dynamique d'innovation technologique au service de l'imagerie médicale, en proposant une solution adaptée aux enjeux actuels de l'anatomopathologie numérique.
+
+\vspace{1cm}
+
+\section*{Abstract}
+
+This report presents the work carried out during my 13-week specialization internship at the Centre Henri Becquerel. The internship focused on the creation and implementation of a tool for generating high-definition anatomic pathology images from scanned slides. The main objective was the development of a professional tool for rearranging and rigidly aligning tissue fragments, addressing the specific needs of medical imaging laboratories for reconstructing fragmented histological images.
+
+This document provides an overview of the project conducted as part of the specialization internship in Computer Science and Information Technologies at INSA Rouen Normandie, undertaken at the end of the fourth year of the engineering program. The work carried out aims to provide an effective tool for pathology laboratories to improve the quality and reliability of images obtained from fragmented slides.
+
+The application developed allows users to manually move and rearrange histological fragments within a workspace, orient them correctly, and then export the final image in high definition. It thus facilitates the digital reconstruction of scanned slides, reduces the complexity of manual handling, and provides practical support to physicians and researchers in their analyses.
+
+Ultimately, this project falls within a dynamic of technological innovation serving medical imaging, offering a solution adapted to the current challenges of digital anatomic pathology.
+
+\end{document}

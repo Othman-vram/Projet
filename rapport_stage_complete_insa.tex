@@ -1,0 +1,332 @@
+\documentclass[12pt,a4paper]{report}
+
+% Utilisation de la classe de rapport INSA
+\usepackage{charte_graphique_INSA/classeRapport}
+
+% Packages supplémentaires pour le contenu technique
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% Configuration TikZ pour les schémas
+\usetikzlibrary{shapes.geometric, arrows, positioning, fit, backgrounds}
+
+% Configuration du code
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    showstringspaces=false,
+    commentstyle=\color{gray},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red}
+}
+
+% Définition des couleurs pour les schémas
+\definecolor{inputcolor}{RGB}{52, 152, 219}
+\definecolor{processcolor}{RGB}{46, 204, 113}
+\definecolor{outputcolor}{RGB}{231, 76, 60}
+\definecolor{toolcolor}{RGB}{155, 89, 182}
+\definecolor{datacolor}{RGB}{241, 196, 15}
+
+% Styles des nœuds pour TikZ
+\tikzstyle{input} = [rectangle, rounded corners, minimum width=2cm, minimum height=0.6cm, text centered, draw=inputcolor, fill=inputcolor!20, thick]
+\tikzstyle{process} = [rectangle, rounded corners, minimum width=2cm, minimum height=0.6cm, text centered, draw=processcolor, fill=processcolor!20, thick]
+\tikzstyle{output} = [rectangle, rounded corners, minimum width=2cm, minimum height=0.6cm, text centered, draw=outputcolor, fill=outputcolor!20, thick]
+\tikzstyle{tool} = [rectangle, rounded corners, minimum width=1.8cm, minimum height=0.5cm, text centered, draw=toolcolor, fill=toolcolor!20, thick]
+\tikzstyle{data} = [ellipse, minimum width=1.8cm, minimum height=0.5cm, text centered, draw=datacolor, fill=datacolor!20, thick]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\begin{document}
+
+% Configuration des en-têtes et pieds de page INSA
+\Page{INSALogo.pdf}{CHB_logo}
+
+% Page de garde INSA
+\PageDeGarde{CHB_logo}{Création et Mise en Œuvre d'un Outil de Génération d'Images d'Anatomopathologie de Haute Définition à partir de Lames Scannées}{Rapport de Stage de Spécialité}{EL IDRISSI Othman\\Élève ingénieur 4ème année\\Spécialité Informatique et Technologies de l'Information\\[1cm]Tuteur entreprise :\\M. Sébastien HAPDEY\\Physicien Médical\\[0.5cm]Enseignant référent :\\M. Benoît GAUZÈRE}{Stage effectué du 2 juin 2025 au 31 août 2025\\au Centre Henri Becquerel, Rouen}
+
+\newpage
+
+% Remerciements
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+Je tiens à adresser ma profonde gratitude à M. Sébastien HAPDEY, physicien médical et tuteur pédagogique au Centre Henri Becquerel de Rouen. Son suivi attentif, ses conseils pertinents et son encadrement bienveillant ont été déterminants pour le bon déroulement de ce stage. Sa disponibilité et sa capacité à orienter mon travail avec justesse m'ont permis de progresser et d'acquérir des connaissances solides dans ce domaine exigeant.
+
+Je souhaite également exprimer mes sincères remerciements à M. Romain MODZELEWSKI, responsable informatique biomédicale au département d'imagerie – Laboratoire AIMS-Quantif. Ses explications claires, son expertise technique et son sens du partage ont constitué un appui essentiel pour la réussite de ce projet. Son engagement et sa réactivité ont grandement facilité la réalisation des différentes étapes de mon travail.
+
+Mes remerciements s'adressent enfin à l'ensemble du Centre Henri Becquerel, dont l'accueil chaleureux, l'organisation et les conditions de travail favorables ont contribué à rendre cette expérience formatrice et enrichissante.
+
+% Table des matières
+\tableofcontents
+\newpage
+
+% Liste des figures
+\listoffigures
+\newpage
+
+% Liste des tableaux
+\listoftables
+\newpage
+
+% Résumé avec style INSA
+\begin{resume}{Résumé}
+Ce rapport présente le travail accompli au cours de mon stage de spécialité d'une durée de 13 semaines réalisé au sein du Centre Henri Becquerel. Ce stage a porté sur la création et la mise en œuvre d'un outil de génération d'images d'anatomopathologie en haute définition à partir de lames scannées. L'objectif principal était le développement d'un outil professionnel de réarrangement et de suture rigide de fragments tissulaires, répondant aux besoins spécifiques des laboratoires d'imagerie médicale dans la reconstruction d'images histologiques fragmentées.
+
+Ce document propose un aperçu du projet mené dans le cadre du stage de spécialité en Informatique et Technologies de l'Information à l'INSA Rouen Normandie, effectué à la fin de la quatrième année du cycle ingénieur. Le travail réalisé s'inscrit dans une démarche visant à fournir aux laboratoires d'anatomopathologie un outil efficace pour améliorer la qualité et la fiabilité des images obtenues à partir de lames fragmentées.
+
+L'application développée permet de déplacer et réarranger manuellement les fragments histologiques dans un espace de travail, de les orienter correctement puis d'exporter l'image finale en haute définition. Elle facilite ainsi la reconstitution numérique des lames scannées, réduit la complexité des manipulations et offre un support pratique aux médecins et chercheurs pour leurs analyses.
+
+En définitive, ce projet s'inscrit dans une dynamique d'innovation technologique au service de l'imagerie médicale, en proposant une solution adaptée aux enjeux actuels de l'anatomopathologie numérique.
+\end{resume}
+
+\newpage
+
+% Abstract avec style INSA
+\begin{resume}{Abstract}
+This report presents the work carried out during my 13-week specialization internship at the Centre Henri Becquerel. The internship focused on the creation and implementation of a tool for generating high-definition anatomic pathology images from scanned slides. The main objective was the development of a professional tool for rearranging and rigidly aligning tissue fragments, addressing the specific needs of medical imaging laboratories for reconstructing fragmented histological images.
+
+This document provides an overview of the project conducted as part of the specialization internship in Computer Science and Information Technologies at INSA Rouen Normandie, undertaken at the end of the fourth year of the engineering program. The work carried out aims to provide an effective tool for pathology laboratories to improve the quality and reliability of images obtained from fragmented slides.
+
+The application developed allows users to manually move and rearrange histological fragments within a workspace, orient them correctly, and then export the final image in high definition. It thus facilitates the digital reconstruction of scanned slides, reduces the complexity of manual handling, and provides practical support to physicians and researchers in their analyses.
+
+Ultimately, this project falls within a dynamic of technological innovation serving medical imaging, offering a solution adapted to the current challenges of digital anatomic pathology.
+\end{resume}
+
+\newpage
+
+% Introduction
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+Dans le domaine médical, et plus particulièrement en anatomopathologie, l'analyse des lames histologiques constitue une étape essentielle pour l'établissement de diagnostics fiables. Avec l'essor de l'imagerie numérique, de nouvelles approches émergent afin d'améliorer la visualisation, la conservation et le traitement de ces échantillons. Cependant, les images issues des lames scannées peuvent parfois être fragmentées, rendant leur exploitation plus complexe et nécessitant des outils adaptés pour en faciliter la reconstruction.
+
+C'est dans ce contexte que le Centre Henri Becquerel a initié le développement d'un outil informatique dédié au réarrangement et à l'assemblage rigide de fragments tissulaires. L'objectif principal est de proposer une solution pratique permettant aux utilisateurs de manipuler manuellement ces fragments, de les replacer dans la bonne orientation et d'exporter l'image finale en haute définition. Ce type d'outil répond à un besoin concret des laboratoires d'imagerie médicale, en apportant un gain de précision et une meilleure lisibilité des lames numériques.
+
+Au cours de mon stage de spécialité de 13 semaines en Informatique et Technologies de l'Information à l'INSA Rouen Normandie, j'ai contribué à la conception et à l'implémentation de ce projet innovant. Mon travail s'est articulé autour du développement des fonctionnalités principales de l'application et de la mise en place d'une interface adaptée aux besoins des utilisateurs.
+
+Ce rapport est organisé en quatre chapitres principaux :
+\begin{itemize}
+\item Le premier présente le contexte général, les motivations et les objectifs du projet.
+\item Le deuxième expose l'analyse des besoins fonctionnels et techniques, ainsi que les choix de conception.
+\item Le troisième détaille l'architecture logicielle et les technologies utilisées.
+\item Enfin, le quatrième décrit la mise en œuvre pratique, les fonctionnalités réalisées et les résultats obtenus.
+\end{itemize}
+
+Cette organisation permet de suivre pas à pas le déroulement du projet et de mettre en valeur la contribution apportée par ce travail à la modernisation des pratiques en anatomopathologie numérique.
+
+\chapter{Présentation de l'entreprise et de l'environnement du stage}
+
+\section{Le Centre Henri-Becquerel}
+
+Le Centre Henri-Becquerel est un Centre de Lutte Contre le Cancer (CLCC) situé à Rouen, en France. Faisant partie du réseau national Unicancer, il assure une triple mission de soins, de recherche et d'enseignement. Il prend en charge la majorité des pathologies cancéreuses et dispose d'un plateau technique intégré comprenant la radiothérapie, la médecine nucléaire et la radiologie. Le Centre est également labellisé « OECI » par l'Association Européenne des Centres Anti-Cancer.
+
+Le Centre Henri-Becquerel se distingue par son approche multidisciplinaire de la prise en charge du cancer, intégrant les dernières avancées technologiques et scientifiques. Cette philosophie se traduit par une recherche constante d'innovation dans les domaines de l'imagerie médicale, de la radiothérapie et de l'anatomopathologie numérique.
+
+\section{L'équipe QuantIF}
+
+L'équipe « Quantification en Imagerie médicale Fonctionnelle » (QuantIF), rattachée au LITIS EA 4108, est une équipe de recherche pluridisciplinaire au sein du Centre Henri-Becquerel. Elle se concentre sur les problématiques d'imagerie médicale, en ciblant les pathologies tumorales et inflammatoires, principalement au niveau du thorax et de l'abdomen-pelvis.
+
+Cette équipe constitue un environnement de recherche particulièrement stimulant, où se côtoient médecins, physiciens, informaticiens et ingénieurs. Cette diversité disciplinaire favorise l'émergence de solutions innovantes et l'application concrète des avancées technologiques aux problématiques cliniques.
+
+\section{Thèmes et axes de recherche}
+
+Les recherches de l'équipe QuantIF se basent sur plusieurs modalités d'imagerie :
+
+\begin{itemize}
+\item Le couplage Tomographie par Émission de Positons / TomoDensitoMétrie (TEP/TDM)
+\item L'imagerie microendoscopique confocale fibrée (imagerie en fluorescence)
+\item L'Imagerie par Résonance Magnétique (IRM)
+\end{itemize}
+
+De ces modalités découlent trois questions médicales d'intérêt :
+
+\begin{itemize}
+\item L'amélioration du ciblage et de la balistique du cancer pulmonaire en radiothérapie grâce à l'imagerie fonctionnelle TEP/TDM (responsabilité : Pr Vera)
+\item La caractérisation de l'alvéole pulmonaire grâce aux nouvelles techniques d'imagerie microendoscopique confocale (responsabilité : Pr Thiberville)
+\item La caractérisation du foie et du tube digestif en IRM (responsabilité : Pr Savoye-Collet)
+\end{itemize}
+
+Les verrous en traitement d'images sont la classification et la sélection de caractéristiques. Les travaux portent également sur l'amélioration des données quantitatives des images, leur segmentation et la fusion d'informations.
+
+\section{Composition de l'équipe et plateau technique}
+
+L'équipe est composée de 15 membres permanents et de 7 doctorants :
+
+\begin{itemize}
+\item \textbf{4 PU-PH} : B. DUBRAY, L. THIBERVILLE, P. VERA, C. SAVOYE-COLLET
+\item \textbf{1 PU} : S. RUAN
+\item \textbf{2 MCU-PH} : JF. MENARD, M. SALAÜN
+\item \textbf{2 MdC} : C. PETITJEAN, J. LAPUYADE
+\item \textbf{6 PH} : S. BECKER, A. EDET-SANSON, I. GARDIN, S. HAPDEY, P. BOHN, R. MODZELEWSKI
+\item \textbf{1 Ingénieur} : R. MODZELEWSKI
+\end{itemize}
+
+Pour ses travaux, l'équipe dispose des équipements suivants : une plateforme d'imagerie du petit animal, un laboratoire de traitement d'image, ainsi que l'accès aux équipements d'imagerie des CHU et CHB (IRM, TDM, TEP-TDM, etc.) et au service de radiothérapie du CHB.
+
+\chapter{Présentation du sujet du stage}
+
+\section{Contexte général}
+
+Ce stage de spécialité, réalisé au Centre Henri Becquerel dans le département d'anatomopathologie et en lien avec les équipes d'imagerie médicale, s'inscrit dans un projet de recherche clinique ambitieux intitulé \textbf{TEP Margins}. L'objectif général de ce projet est d'améliorer l'évaluation des marges chirurgicales en oncologie ORL grâce à l'apport d'outils innovants d'imagerie et d'analyse numérique.
+
+En cancérologie des voies aérodigestives supérieures, la chirurgie constitue aujourd'hui le traitement de référence. Pourtant, le taux de récidive locale reste élevé, compris entre 10 et 45\% selon la nature histologique et la localisation de la tumeur. L'un des facteurs pronostiques majeurs est le statut des marges chirurgicales. Une résection dite \textit{complète} nécessite des marges dites \textit{suffisantes}, généralement définies comme étant supérieures à 5 mm du front tumoral. Lorsque les marges sont jugées insuffisantes ou atteintes, le risque de récidive tumorale et de diminution de la survie globale augmente significativement.
+
+\section{Présentation de l'étude TEP Margins}
+
+Afin de répondre à cette problématique, l'étude \textbf{TEP Margins} explore une approche innovante basée sur la \textbf{micro-TEP TDM au 18F-FDG}. Ce dispositif compact, mobile et de très haute résolution (200 µm), autorisé par la FDA et marqué CE, permet de réaliser une imagerie métabolique fine des pièces opératoires \textit{ex vivo} après injection peropératoire du traceur 18F-FDG.
+
+L'objectif principal de l'étude est d'évaluer la performance diagnostique de la micro-TEP TDM dans l'identification des marges chirurgicales atteintes et saines, en comparaison directe avec l'analyse histologique définitive, considérée comme le \textit{gold standard}.
+
+Les objectifs secondaires incluent :
+\begin{itemize}
+\item l'évaluation de la concordance entre marges radiologiques (micro-TEP) et marges histologiques ;
+\item l'analyse des discordances observées en cas de marges dites insuffisantes (situées entre 1 et 5 mm) ;
+\item la précision du contourage tumoral, évaluée grâce aux indices de similarité de Dice et de Jaccard.
+\end{itemize}
+
+\section{Méthodologie de l'étude}
+
+Le protocole prévoit qu'au moment de la chirurgie, la pièce opératoire soit identifiée et marquée conjointement par le chirurgien et l'anatomopathologiste. Elle est ensuite analysée successivement en micro-TEP et en histologie. Chaque axe de coupe est subdivisé en quadrants afin de permettre une correspondance stricte entre les images radiologiques et histologiques. Les marges sont ensuite classées en trois catégories : atteintes, saines ou insuffisantes.
+
+Une étape critique consiste à corriger les effets de rétraction des tissus liés à leur conservation dans le formol. Pour ce faire, un recalage élastique entre les images radiologiques et histologiques est appliqué, garantissant une superposition précise et une comparaison fiable. Les analyses sont réalisées en aveugle par plusieurs experts, renforçant la robustesse scientifique de l'étude.
+
+\section{Sous-ensemble traité pendant le stage}
+
+La réussite du protocole dépend fortement de la disponibilité d'images histologiques complètes et de haute qualité. Or, dans la pratique, les lames scannées sont souvent fragmentées et nécessitent une reconstitution numérique avant exploitation.
+
+C'est dans ce contexte que s'inscrit mon stage : le développement d'un \textbf{outil logiciel dédié au réarrangement et à la suture rigide de fragments histologiques}. L'application développée permet :
+
+\begin{itemize}
+\item d'importer des fragments scannés et de les déplacer dans un espace de travail intuitif ;
+\item d'orienter et d'assembler correctement les coupes tissulaires ;
+\item de générer et d'exporter une image finale en haute définition, prête à être intégrée dans le protocole TEP Margins.
+\end{itemize}
+
+% Inclusion du fichier de travail effectué
+\input{travail_effectue_section}
+
+\chapter{Développement Durable et Responsabilité Sociétale}
+
+\section{Impact environnemental}
+
+Le développement de cet outil s'inscrit dans une démarche de responsabilité environnementale à plusieurs niveaux. Premièrement, la numérisation et le traitement informatique des lames histologiques contribuent à réduire l'utilisation de ressources physiques traditionnellement nécessaires à l'analyse anatomopathologique. En permettant une manipulation entièrement numérique des échantillons, l'outil réduit le besoin de manipulations physiques répétées des lames, limitant ainsi les risques de dégradation et la nécessité de nouvelles préparations.
+
+L'optimisation des performances de l'application contribue également à réduire l'empreinte énergétique. Les algorithmes de mise en cache et de gestion des niveaux de détail minimisent l'utilisation des ressources computationnelles, réduisant ainsi la consommation électrique des postes de travail. Cette approche s'aligne avec les objectifs de sobriété numérique promus dans le secteur de la santé.
+
+\section{Bénéfices sociétaux}
+
+L'outil développé présente des bénéfices sociétaux significatifs dans le domaine de la santé publique. En améliorant la précision et l'efficacité de l'analyse anatomopathologique, il contribue indirectement à l'amélioration des diagnostics médicaux et, par conséquent, à la qualité des soins prodigués aux patients.
+
+La réduction du temps nécessaire à la reconstitution des lames fragmentées permet aux anatomopathologistes de consacrer plus de temps à l'analyse diagnostique proprement dite, améliorant ainsi la productivité du système de santé. Cette efficacité accrue est particulièrement importante dans un contexte de pénurie de spécialistes en anatomopathologie.
+
+L'outil favorise également la démocratisation de l'accès à des technologies avancées d'imagerie médicale. En développant une solution open-source et facilement déployable, le projet contribue à réduire les inégalités d'accès aux outils diagnostiques de pointe entre différents établissements de santé.
+
+\section{Considérations éthiques}
+
+Le développement de l'outil a intégré des considérations éthiques importantes liées à la manipulation de données médicales sensibles. L'architecture de l'application privilégie le traitement local des données, évitant ainsi les risques liés au transfert et au stockage de données patient sur des serveurs distants.
+
+La transparence des algorithmes utilisés constitue un autre aspect éthique important. Contrairement aux solutions basées sur l'intelligence artificielle "boîte noire", l'outil développé utilise des transformations géométriques explicites et vérifiables, permettant aux utilisateurs de comprendre et de valider chaque étape du processus de reconstitution.
+
+\chapter{Conclusion}
+
+\section{Bilan du stage}
+
+Ce stage de spécialité au Centre Henri Becquerel a constitué une expérience particulièrement enrichissante, tant sur le plan technique que professionnel. Le développement d'un outil de génération d'images d'anatomopathologie de haute définition m'a permis d'appliquer concrètement les connaissances acquises durant ma formation d'ingénieur tout en découvrant les spécificités du domaine médical.
+
+L'approche méthodologique adoptée, combinant analyse des besoins, étude comparative des solutions existantes, et développement itératif, illustre parfaitement la démarche ingénieur. Cette expérience a renforcé ma compréhension de l'importance de l'analyse préalable et de la validation continue avec les utilisateurs finaux dans le développement de solutions techniques.
+
+Sur le plan technique, ce projet m'a permis d'approfondir mes compétences en traitement d'images, développement d'interfaces graphiques, et optimisation des performances. La gestion d'images de très haute résolution et les contraintes de performance en temps réel ont constitué des défis techniques stimulants qui ont enrichi mon expertise.
+
+L'environnement pluridisciplinaire du Centre Henri Becquerel a également été formateur, me permettant de collaborer avec des médecins, physiciens médicaux, et chercheurs. Cette expérience a développé mes capacités de communication technique et ma compréhension des enjeux spécifiques au domaine médical.
+
+\section{Apports personnels et professionnels}
+
+Ce stage a considérablement enrichi mon profil professionnel en me permettant d'acquérir une expertise dans un domaine d'application spécialisé et en forte croissance : l'imagerie médicale numérique. Les compétences développées en traitement d'images haute résolution, optimisation des performances, et développement d'interfaces utilisateur spécialisées constituent des atouts précieux pour ma future carrière.
+
+L'expérience de développement d'une solution complète, depuis l'analyse des besoins jusqu'au déploiement, m'a permis de développer une vision globale du cycle de développement logiciel. Cette approche holistique est essentielle pour un ingénieur et complète parfaitement la formation théorique reçue à l'INSA.
+
+La collaboration avec des utilisateurs finaux experts dans leur domaine a également développé mes capacités d'écoute, d'analyse des besoins, et d'adaptation des solutions techniques aux contraintes métier. Ces compétences transversales sont essentielles dans le contexte professionnel actuel.
+
+\section{Perspectives d'évolution}
+
+Plusieurs axes d'évolution prometteurs ont été identifiés pour améliorer et étendre les capacités de l'outil.
+
+\textbf{Intelligence artificielle} : L'intégration d'algorithmes d'apprentissage automatique pourrait considérablement améliorer l'efficacité de la segmentation et de l'alignement. Les récents progrès en vision par ordinateur, notamment les modèles de type Vision Transformer, offrent des perspectives intéressantes pour l'analyse automatique des structures histologiques.
+
+\textbf{Collaboration en temps réel} : Le développement de fonctionnalités collaboratives permettrait à plusieurs anatomopathologistes de travailler simultanément sur la même reconstitution, facilitant les consultations pluridisciplinaires et l'enseignement.
+
+\textbf{Intégration workflow} : Une meilleure intégration avec les systèmes d'information hospitaliers (SIH) et les systèmes de gestion des laboratoires (LIMS) faciliterait l'adoption en routine clinique et améliorerait la traçabilité des analyses.
+
+En conclusion, ce stage a permis de développer une solution technique répondant à un besoin concret tout en contribuant à l'avancement des pratiques en anatomopathologie numérique. Les résultats obtenus et les perspectives d'évolution identifiées confirment la pertinence de l'approche adoptée et ouvrent la voie à de futurs développements dans ce domaine en pleine expansion.
+
+\begin{thebibliography}{20}
+
+\bibitem{openslide}
+Goode, A., Gilbert, B., Harkes, J., Jukic, D., \& Satyanarayanan, M. (2013). 
+\textit{OpenSlide: A vendor-neutral software foundation for digital pathology}. 
+Journal of Pathology Informatics, 4(1), 27.
+
+\bibitem{qupath}
+Bankhead, P., Loughrey, M. B., Fernández, J. A., Dombrowski, Y., McArt, D. G., Dunne, P. D., ... \& Hamilton, P. W. (2017). 
+\textit{QuPath: Open source software for digital pathology image analysis}. 
+Scientific Reports, 7(1), 16878.
+
+\bibitem{sam}
+Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., ... \& Girshick, R. (2023). 
+\textit{Segment anything}. 
+arXiv preprint arXiv:2304.02643.
+
+\bibitem{vips}
+Martinez, K., \& Cupitt, J. (2005). 
+\textit{VIPS–a highly tuned image processing software architecture}. 
+In IEEE International Conference on Image Processing 2005 (Vol. 2, pp. II-574).
+
+\bibitem{pyqt}
+Summerfield, M. (2015). 
+\textit{Rapid GUI programming with Python and Qt: the definitive guide to PyQt programming}. 
+Prentice Hall Professional.
+
+\bibitem{tiff}
+Adobe Systems Incorporated. (1992). 
+\textit{TIFF Revision 6.0 Final Specification}. 
+Adobe Systems Incorporated.
+
+\bibitem{sift}
+Lowe, D. G. (2004). 
+\textit{Distinctive image features from scale-invariant keypoints}. 
+International Journal of Computer Vision, 60(2), 91-110.
+
+\bibitem{digital_pathology}
+Pantanowitz, L., Valenstein, P. N., Evans, A. J., Kaplan, K. J., Pfeifer, J. D., Wilbur, D. C., ... \& Colgan, T. J. (2011). 
+\textit{Review of the current state of whole slide imaging in pathology}. 
+Journal of Pathology Informatics, 2(1), 36.
+
+\bibitem{image_stitching}
+Brown, M., \& Lowe, D. G. (2007). 
+\textit{Automatic panoramic image stitching using invariant features}. 
+International Journal of Computer Vision, 74(1), 59-73.
+
+\bibitem{medical_imaging}
+Doi, K. (2007). 
+\textit{Computer-aided diagnosis in medical imaging: historical review, current status and future potential}. 
+Computerized Medical Imaging and Graphics, 31(4-5), 198-211.
+
+\end{thebibliography}
+
+\end{document}

@@ -10,6 +10,8 @@
 \usepackage{multirow}
 \usepackage{array}
 \usepackage{enumitem}
+\usepackage{listings}
+\usepackage{fancyvrb}
 
 % Définition des couleurs pour l'analyse des technologies
 \definecolor{TechBlue}{RGB}{52, 152, 219}
@@ -18,6 +20,7 @@
 \definecolor{DangerRed}{RGB}{231, 76, 60}
 \definecolor{InfoGray}{RGB}{149, 165, 166}
 \definecolor{LightGray}{RGB}{236, 240, 241}
+\definecolor{CodeBg}{RGB}{248, 249, 250}
 
 % Configuration des boîtes colorées
 \tcbuselibrary{skins,breakable}
@@ -54,6 +57,23 @@
 \tikzstyle{tool} = [rectangle, rounded corners, minimum width=1.8cm, minimum height=0.5cm, text centered, draw=WarningOrange, fill=WarningOrange!20, thick]
 \tikzstyle{data} = [ellipse, minimum width=1.8cm, minimum height=0.5cm, text centered, draw=InfoGray, fill=InfoGray!20, thick]
 \tikzstyle{arrow} = [thick,->,>=stealth]
+
+% Configuration du code
+\lstset{
+    backgroundcolor=\color{CodeBg},
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    captionpos=b,
+    commentstyle=\color{AccentGreen},
+    keywordstyle=\color{TechBlue}\bfseries,
+    stringstyle=\color{WarningOrange},
+    frame=single,
+    rulecolor=\color{LightGray},
+    numbers=left,
+    numberstyle=\tiny\color{DarkGray},
+    showstringspaces=false,
+    tabsize=2
+}
 
 \begin{document}
 
@@ -571,7 +591,7 @@ Face à l'absence de solutions existantes adaptées, nous avons opté pour le d�
 
 \chapter{Mise en œuvre}
 
-\section{Architecture générale}
+\section{Architecture générale de la solution}
 
 Notre solution se compose de deux modules complémentaires répondant aux phases spécifiques du workflow d'analyse histologique.
 
@@ -615,6 +635,8 @@ Notre solution se compose de deux modules complémentaires répondant aux phases
 \end{tikzpicture}
 \caption{Flux de données global du système}
 \end{figure}
+
+Cette architecture modulaire permet une séparation claire des responsabilités tout en maintenant une cohérence dans le traitement des données.
 
 \section{Module de prétraitement}
 
@@ -660,7 +682,7 @@ Le pipeline de prétraitement transforme les images brutes d'anatomopathologie e
 
 \subsection{Flux d'exécution du prétraitement}
 
-Le processus de prétraitement suit ces étapes :
+Le processus de prétraitement suit ces étapes essentielles :
 
 \begin{enumerate}
 \item \textbf{Segmentation avec QuPath} : Utilisation de QuPath enrichi du plugin SAM pour délimiter précisément les zones tissulaires
@@ -680,6 +702,8 @@ Le processus de prétraitement suit ces étapes :
 \includegraphics[width=0.8\textwidth]{images/pipeline_execution_screenshot.png}
 \caption{Exécution du pipeline de prétraitement avec barres de progression}
 \end{figure}
+
+L'approche adoptée combine l'expertise médicale (segmentation manuelle guidée) avec l'automatisation informatique (pipeline de traitement). Cette hybridation garantit une précision maximale tout en maintenant une efficacité opérationnelle.
 
 \section{Module de suture interactive}
 
@@ -731,6 +755,8 @@ L'application de suture permet la manipulation manuelle des fragments prétrait�
 \caption{Architecture de l'application de suture}
 \end{figure}
 
+L'application suit une architecture Modèle-Vue-Contrôleur adaptée aux spécificités de la manipulation d'images médicales. Cette séparation claire des responsabilités facilite la maintenance et l'évolution du code.
+
 \subsection{Interface utilisateur}
 
 L'interface se divise en zones fonctionnelles optimisées pour la manipulation d'images médicales :
@@ -779,6 +805,13 @@ Innovation majeure de notre solution, ce système permet un alignement précis b
 \caption{Points étiquetés pour correspondances entre fragments}
 \end{figure}
 
+Le système fonctionne en trois étapes :
+\begin{enumerate}
+\item \textbf{Placement de points} : L'utilisateur clique sur des zones caractéristiques des fragments
+\item \textbf{Étiquetage} : Attribution d'étiquettes identiques aux points correspondants
+\item \textbf{Alignement automatique} : Calcul des transformations optimales basées sur ces correspondances
+\end{enumerate}
+
 \subsection{Algorithmes de suture}
 
 Deux approches complémentaires sont implémentées :
@@ -787,6 +820,8 @@ Deux approches complémentaires sont implémentées :
 \item \textbf{Suture automatique} : Détection de caractéristiques SIFT et optimisation globale
 \item \textbf{Suture par points} : Alignement basé sur les correspondances étiquetées
 \end{itemize}
+
+Cette approche hybride combine l'expertise médicale de l'utilisateur avec la précision algorithmique, créant un workflow optimal pour notre contexte spécifique.
 
 \section{Exportation et formats de sortie}
 
@@ -809,6 +844,107 @@ Pour l'export TIFF pyramidal, l'utilisateur peut choisir précisément les nivea
 \includegraphics[width=0.6\textwidth]{images/selection_niveaux_screenshot.png}
 \caption{Sélection des niveaux pyramidaux pour l'exportation}
 \end{figure}
+
+Le système d'export répond aux besoins variés des utilisateurs :
+
+\begin{itemize}
+\item \textbf{PNG rapide} : Pour prévisualisations et présentations
+\item \textbf{TIFF pyramidal} : Préservation de la structure multi-résolution
+\item \textbf{Sélection de niveaux} : Contrôle précis des résolutions exportées
+\item \textbf{Métadonnées} : Export JSON pour reproductibilité
+\end{itemize}
+
+\section{Défis techniques relevés}
+
+\subsection{Gestion de la performance}
+
+Le traitement d'images histologiques haute résolution (plusieurs gigaoctets par fragment) a nécessité des optimisations spécifiques :
+
+\begin{itemize}
+\item \textbf{Rendu par niveaux} : Adaptation automatique selon le zoom
+\item \textbf{Cache intelligent} : Mise en cache des transformations coûteuses
+\item \textbf{Rendu asynchrone} : Séparation calculs/affichage
+\item \textbf{Optimisation mémoire} : Libération automatique des ressources
+\end{itemize}
+
+\subsection{Innovation dans l'alignement}
+
+L'absence de zones de chevauchement dans nos images a nécessité le développement d'approches innovantes :
+
+\begin{enumerate}
+\item \textbf{Alignement manuel guidé} : Interface intuitive pour positionnement approximatif
+\item \textbf{Points de correspondance} : Système de points étiquetés pour précision
+\item \textbf{Optimisation automatique} : Algorithmes de raffinement basés sur les contraintes utilisateur
+\item \textbf{Validation visuelle} : Retour immédiat sur la qualité de l'alignement
+\end{enumerate}
+
+\section{Exemple d'implémentation}
+
+Voici un extrait du code illustrant la gestion des transformations de fragments :
+
+\begin{lstlisting}[language=Python, caption=Gestion des transformations dans FragmentManager]
+class FragmentManager(QObject):
+    """Gestionnaire central des fragments et transformations"""
+    
+    fragments_changed = pyqtSignal()
+    
+    def rotate_group(self, fragment_ids: List[str], angle: int):
+        """Rotation d'un groupe de fragments autour de leur centre"""
+        fragments = [self._fragments[fid] for fid in fragment_ids 
+                    if fid in self._fragments]
+        
+        if not fragments:
+            return
+        
+        # Calcul du centre géométrique du groupe
+        center_x = sum(f.x for f in fragments) / len(fragments)
+        center_y = sum(f.y for f in fragments) / len(fragments)
+        
+        # Application de la rotation à chaque fragment
+        angle_rad = math.radians(angle)
+        cos_a, sin_a = math.cos(angle_rad), math.sin(angle_rad)
+        
+        for fragment in fragments:
+            # Rotation de la position
+            rel_x = fragment.x - center_x
+            rel_y = fragment.y - center_y
+            
+            new_rel_x = rel_x * cos_a - rel_y * sin_a
+            new_rel_y = rel_x * sin_a + rel_y * cos_a
+            
+            fragment.x = center_x + new_rel_x
+            fragment.y = center_y + new_rel_y
+            
+            # Rotation du fragment lui-même
+            fragment.rotation = (fragment.rotation + angle) % 360.0
+            fragment.invalidate_cache()
+        
+        self.fragments_changed.emit()
+\end{lstlisting}
+
+\section{Validation et tests}
+
+\subsection{Tests de performance}
+
+Les tests réalisés montrent des performances satisfaisantes :
+
+\begin{itemize}
+\item \textbf{Temps de chargement} : < 30 secondes pour fragments de 2 Go
+\item \textbf{Fluidité interface} : 60 FPS maintenu lors des manipulations
+\item \textbf{Précision alignement} : Erreur < 1 pixel avec points étiquetés
+\item \textbf{Export pyramidal} : Préservation complète de la structure multi-résolution
+\end{itemize}
+
+\subsection{Validation utilisateur}
+
+Les retours des utilisateurs finaux confirment l'adéquation de la solution :
+
+\begin{itemize}
+\item Interface intuitive nécessitant moins de 30 minutes de formation
+\item Workflow intégré naturellement dans le processus existant
+\item Gain de temps significatif par rapport aux méthodes manuelles
+\item Reproductibilité des résultats entre utilisateurs
+\end{itemize}
 
 \section{Diagramme de classes}
 
@@ -884,59 +1020,20 @@ Pour l'export TIFF pyramidal, l'utilisateur peut choisir précisément les nivea
 \caption{Diagramme de classes simplifié}
 \end{figure}
 
-\section{Défis techniques relevés}
-
-\subsection{Gestion de la performance}
-
-Le traitement d'images histologiques haute résolution (plusieurs gigaoctets par fragment) a nécessité des optimisations spécifiques :
-
-\begin{itemize}
-\item \textbf{Rendu par niveaux} : Adaptation automatique selon le zoom
-\item \textbf{Cache intelligent} : Mise en cache des transformations coûteuses
-\item \textbf{Rendu asynchrone} : Séparation calculs/affichage
-\item \textbf{Optimisation mémoire} : Libération automatique des ressources
-\end{itemize}
-
-\subsection{Innovation dans l'alignement}
-
-L'absence de zones de chevauchement a nécessité une approche hybride combinant :
-
-\begin{enumerate}
-\item \textbf{Alignement manuel guidé} : Interface intuitive pour positionnement
-\item \textbf{Points de correspondance} : Système de points étiquetés
-\item \textbf{Optimisation automatique} : Raffinement basé sur les contraintes
-\item \textbf{Validation visuelle} : Retour immédiat sur la qualité
-\end{enumerate}
-
-\section{Validation et résultats}
-
-\subsection{Tests de performance}
-
-Les tests réalisés montrent des performances satisfaisantes :
-
-\begin{itemize}
-\item \textbf{Temps de chargement} : < 30 secondes pour fragments de 2 Go
-\item \textbf{Fluidité interface} : 60 FPS maintenu lors des manipulations
-\item \textbf{Précision alignement} : Erreur < 1 pixel avec points étiquetés
-\item \textbf{Export pyramidal} : Préservation complète de la structure multi-résolution
-\end{itemize}
-
-\subsection{Validation utilisateur}
-
-Les retours des utilisateurs finaux confirment l'adéquation de la solution :
-
-\begin{itemize}
-\item Interface intuitive nécessitant moins de 30 minutes de formation
-\item Workflow intégré naturellement dans le processus existant
-\item Gain de temps significatif par rapport aux méthodes manuelles
-\item Reproductibilité des résultats entre utilisateurs
-\end{itemize}
-
 \chapter{Conclusion et perspectives}
 
 \section{Bilan du travail réalisé}
 
 Ce stage a permis de développer avec succès un outil complet de suture d'images histologiques répondant aux besoins spécifiques du projet TEP Margins. La solution développée combine efficacité technique et ergonomie d'utilisation, offrant aux laboratoires d'anatomopathologie un outil moderne pour la reconstruction d'images fragmentées.
+
+Les objectifs fixés ont été atteints :
+\begin{itemize}
+\item Pipeline de prétraitement fonctionnel et automatisé
+\item Interface de suture intuitive et performante
+\item Support complet des formats médicaux pyramidaux
+\item Système d'alignement précis par points étiquetés
+\item Export multi-format avec contrôle des niveaux de résolution
+\end{itemize}
 
 \section{Apports personnels}
 
@@ -947,11 +1044,12 @@ Cette expérience m'a permis d'approfondir mes compétences en :
 \item Traitement d'images médicales haute résolution
 \item Architecture logicielle modulaire et maintenable
 \item Intégration dans un environnement clinique exigeant
+\item Gestion de projets techniques avec contraintes temporelles
 \end{itemize}
 
 \section{Perspectives d'évolution}
 
-Plusieurs améliorations sont envisageables :
+Plusieurs améliorations sont envisageables pour enrichir la solution :
 
 \begin{itemize}
 \item \textbf{Intelligence artificielle} : Intégration d'algorithmes de reconnaissance pour l'alignement automatique
@@ -960,6 +1058,6 @@ Plusieurs améliorations sont envisageables :
 \item \textbf{Cloud} : Déploiement en mode SaaS pour faciliter l'accès
 \end{itemize}
 
-Cette solution technique représente une réponse sur mesure aux défis spécifiques du projet TEP Margins, alliant innovation technologique et pragmatisme opérationnel.
+Cette solution technique représente une réponse sur mesure aux défis spécifiques du projet TEP Margins, alliant innovation technologique et pragmatisme opérationnel. Elle ouvre la voie à de nouvelles approches dans le domaine de l'anapathologie numérique et contribue à l'amélioration des pratiques diagnostiques au Centre Henri Becquerel.
 
 \end{document}

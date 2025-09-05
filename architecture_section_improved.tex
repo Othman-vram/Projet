@@ -1,8 +1,8 @@
 \subsection{Architecture générale du système}
 
-La solution développée s'articule autour de deux composants principaux : un pipeline de prétraitement et une application desktop de suture manuelle. Cette architecture modulaire permet une séparation claire des responsabilités et facilite la maintenance et l'évolution du système.
+La solution développée s'articule autour de deux composants principaux : un pipeline de prétraitement automatisé et une application desktop de suture manuelle. Cette architecture modulaire permet une séparation claire des responsabilités et facilite la maintenance et l'évolution du système.
 
-% Schéma d'architecture générale - placé en premier pour donner la vue d'ensemble
+% Schéma d'architecture générale - Vue d'ensemble du système complet
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[node distance=2cm, every node/.style={scale=0.8}]
@@ -42,11 +42,21 @@ La solution développée s'articule autour de deux composants principaux : un pi
 \caption{Flux de données global du système développé}
 \end{figure}
 
-\subsubsection{Module de prétraitement}
+\subsubsection{Concepts fondamentaux}
 
-Le pipeline transforme les images SVS/MRXS en fragments TIFF pyramidaux exploitables. Il utilise QuPath avec le plugin SAM pour la segmentation assistée, puis génère automatiquement les fichiers RGBA avec fond transparent.
+\textbf{Images pyramidales} : Une image pyramidale est une structure de données qui stocke la même image à différentes résolutions, organisées en niveaux hiérarchiques. Le niveau 0 correspond à la résolution maximale, et chaque niveau supérieur divise par deux la résolution du niveau précédent. Cette organisation permet une navigation fluide à différents niveaux de zoom tout en optimisant l'utilisation de la mémoire. Dans le contexte de l'anatomopathologie, cette structure est essentielle car les images peuvent atteindre plusieurs gigapixels.
 
-% Schéma d'architecture du prétraitement - placé logiquement après l'explication
+\textbf{Format TIFF pyramidal} : Le format TIFF (Tagged Image File Format) pyramidal est une extension du format TIFF standard qui supporte le stockage de multiples résolutions dans un seul fichier. Cette structure est particulièrement adaptée aux images de très haute résolution comme celles utilisées en anatomopathologie numérique. Le format préserve les métadonnées importantes (résolution, calibration, informations de scan) nécessaires pour l'analyse quantitative.
+
+\textbf{Segmentation d'images} : La segmentation consiste à partitionner une image en régions homogènes selon certains critères (couleur, texture, intensité). Dans notre contexte, elle permet de séparer les régions tissulaires du fond de la lame, éliminant ainsi les zones non pertinentes pour l'analyse. Cette étape est cruciale car elle détermine la qualité des données d'entrée pour la phase de suture.
+
+\textbf{Suture rigide} : La suture rigide est un processus d'alignement qui préserve la forme et les proportions des fragments tout en permettant uniquement des transformations de translation et de rotation. Cette approche est adaptée aux tissus biologiques où les déformations doivent être minimales pour préserver l'intégrité anatomique. Contrairement à la suture élastique, elle maintient les distances et les angles originaux.
+
+\subsection{Pipeline de prétraitement}
+
+Le pipeline de prétraitement constitue la première étape critique du workflow. Il transforme les images brutes d'anatomopathologie (formats propriétaires SVS/MRXS) en fragments exploitables par l'application de suture. Cette transformation implique plusieurs étapes techniques complexes nécessitant une coordination précise entre différents outils spécialisés.
+
+% Schéma d'architecture du prétraitement - Détail du processus automatisé
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[node distance=1.5cm, every node/.style={scale=0.7}]
@@ -80,28 +90,42 @@ Le pipeline transforme les images SVS/MRXS en fragments TIFF pyramidaux exploita
 \draw [arrow] (extraction) -- (tiffout);
 
 \end{tikzpicture}
-\caption{Architecture de la phase de prétraitement}
+\caption{Architecture détaillée de la phase de prétraitement}
 \end{figure}
 
-% Interface QuPath - placée ici car elle illustre directement la segmentation
+\textbf{Intégration QuPath et SAM} : QuPath est une plateforme open-source d'analyse d'images biomédicales développée par l'Université d'Édimbourg. Le pipeline s'intègre avec QuPath via le plugin Segment Anything Model (SAM), qui permet d'exploiter les outils de sélection natifs de QuPath pour délimiter précisément les zones de tissu à segmenter. Cette approche hybride combine l'expertise médicale (sélection manuelle guidée) avec l'automatisation informatique (raffinement automatique des contours).
+
+% Interface QuPath avec SAM - Illustration de l'outil de segmentation
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{images/qupath_sam_segmentation_screenshot.png}
-\caption{Interface QuPath avec plugin SAM pour la segmentation des tissus}
+\includegraphics[width=0.9\textwidth]{images/qupath_sam_segmentation_screenshot.png}
+\caption{Interface QuPath avec plugin SAM pour la segmentation précise des tissus}
+\label{fig:qupath_sam}
 \end{figure}
 
-% Pipeline en exécution - placée ici car elle montre le processus automatisé
+\textbf{Pipeline automatisé} : Le script \texttt{unified\_tissue\_pipeline.py} implémente une chaîne de traitement automatisée qui coordonne trois étapes principales : la conversion des formats propriétaires, la génération de masques pyramidaux, et l'extraction des tissus avec transparence. Cette approche pipeline garantit la reproductibilité du processus et permet un traitement efficace de volumes importants de données.
+
+% Pipeline en exécution - Démonstration de l'interface utilisateur
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{images/pipeline_execution_screenshot.png}
-\caption{Exécution du pipeline de prétraitement avec barres de progression}
+\includegraphics[width=0.9\textwidth]{images/pipeline_execution_screenshot.png}
+\caption{Interface d'exécution du pipeline avec barres de progression et sélection interactive des niveaux}
+\label{fig:pipeline_execution}
 \end{figure}
 
-\subsubsection{Module de suture interactive}
+\textbf{Gestion des formats propriétaires} : La lecture des formats SVS (Aperio) et MRXS (3DHistech) utilise la bibliothèque OpenSlide, qui fournit une interface unifiée pour accéder aux images pyramidales de différents constructeurs. Cette abstraction permet de traiter uniformément des données provenant de scanners différents tout en préservant les métadonnées spécifiques à chaque format.
 
-L'application desktop suit une architecture MVC avec PyQt6, permettant la manipulation manuelle des fragments prétraités pour reconstituer l'image histologique complète.
+\textbf{Génération TIFF RGBA} : L'étape finale du pipeline produit des fichiers TIFF pyramidaux au format RGBA (Rouge, Vert, Bleu, Alpha) où le canal alpha encode la transparence. Les zones tissulaires conservent leur opacité (alpha = 255) tandis que le fond devient transparent (alpha = 0). Cette approche facilite grandement la manipulation ultérieure des fragments dans l'application de suture.
 
-% Architecture MVC - placée avant l'interface pour expliquer la structure
+\subsection{Application desktop de suture}
+
+L'application desktop constitue le cœur interactif du système, permettant la manipulation manuelle des fragments prétraités pour reconstituer l'image histologique complète. Elle est développée en Python avec le framework PyQt6, garantissant une interface native et performante sur les systèmes Windows et Linux.
+
+\subsubsection{Architecture MVC adaptée}
+
+L'application suit une architecture Modèle-Vue-Contrôleur (MVC) spécialement adaptée aux contraintes de la manipulation d'images médicales haute résolution. Cette architecture garantit une séparation claire des responsabilités et facilite la maintenance et l'évolution du code.
+
+% Schéma d'architecture MVC - Structure logicielle de l'application
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[node distance=1.5cm, every node/.style={scale=0.7}]
@@ -138,73 +162,215 @@ L'application desktop suit une architecture MVC avec PyQt6, permettant la manipu
 \draw [arrow] (export) -- (output);
 
 % Labels
-\node[processcolor] at (0,3.8) {\small \textbf{Modèle}};
-\node[toolcolor] at (4,3.8) {\small \textbf{Vue}};
-\node[outputcolor] at (8,3.8) {\small \textbf{Contrôleur}};
+\node[TechBlue] at (0,3.8) {\small \textbf{Modèle}};
+\node[WarningOrange] at (4,3.8) {\small \textbf{Vue}};
+\node[DangerRed] at (8,3.8) {\small \textbf{Contrôleur}};
 
 \end{tikzpicture}
-\caption{Architecture MVC de l'application de suture}
+\caption{Architecture MVC de l'application de suture avec séparation des responsabilités}
 \end{figure}
 
-% Interface principale - placée après l'architecture pour montrer le résultat concret
+\textbf{Couche Modèle} : La couche modèle encapsule toute la logique métier et la gestion des données. Le \texttt{FragmentManager} centralise la gestion des fragments d'images et de leurs transformations géométriques, implémentant le pattern Observer pour notifier automatiquement l'interface des changements d'état. Le \texttt{PointManager} gère les points étiquetés utilisés pour l'alignement précis, maintenant les correspondances entre fragments et calculant les transformations optimales.
+
+\textbf{Couche Vue} : La couche vue gère l'affichage et l'interaction utilisateur. Le \texttt{CanvasWidget} constitue le composant central de visualisation, utilisant les capacités de rendu accéléré de Qt pour afficher les fragments avec des performances optimales. Il implémente des techniques avancées comme le culling frustum et la gestion des niveaux de détail pour maintenir la fluidité même avec des images de plusieurs gigapixels.
+
+\textbf{Couche Contrôleur} : La couche contrôleur coordonne les interactions entre le modèle et la vue. L'\texttt{ExportManager} gère les différents formats d'exportation, tandis que les algorithmes de suture automatique fournissent une assistance à l'alignement basée sur la détection de caractéristiques.
+
+% Interface principale - Vue d'ensemble de l'application
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{images/interface_principale_screenshot.png}
-\caption{Interface principale avec zones fonctionnelles}
+\caption{Interface principale avec zones fonctionnelles : barre d'outils (haut), liste des fragments (gauche), panneau de contrôle (bas gauche), canvas principal (droite)}
+\label{fig:interface_principale}
 \end{figure}
 
-% Canvas avec fragments - illustre la visualisation des données
+\subsubsection{Diagramme de classes et relations}
+
+L'architecture orientée objet de l'application s'organise autour de classes spécialisées qui encapsulent les différents aspects de la manipulation des fragments. Cette conception modulaire facilite la maintenance et l'extension des fonctionnalités.
+
+% Diagramme de classes - Structure orientée objet détaillée
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=2cm, every node/.style={scale=0.6}]
+
+% Classes principales
+\node (fragment) [process, text width=2.2cm] at (0,3) {
+    \textbf{Fragment}\\
+    \rule{2.2cm}{0.4pt}\\
+    - id: str\\
+    - image\_data\\
+    - x, y: float\\
+    - rotation: float\\
+    - flip\_horizontal: bool\\
+    - flip\_vertical: bool\\
+    \rule{2.2cm}{0.4pt}\\
+    + get\_transformed()\\
+    + contains\_point()\\
+    + invalidate\_cache()
+};
+
+\node (fragmgr) [process, text width=2.2cm] at (4,3) {
+    \textbf{FragmentManager}\\
+    \rule{2.2cm}{0.4pt}\\
+    - fragments: Dict\\
+    - selected\_id: str\\
+    - selected\_ids: List\\
+    \rule{2.2cm}{0.4pt}\\
+    + add\_fragment()\\
+    + rotate\_fragment()\\
+    + translate\_fragment()\\
+    + rotate\_group()
+};
+
+\node (canvas) [process, text width=2.2cm] at (8,3) {
+    \textbf{CanvasWidget}\\
+    \rule{2.2cm}{0.4pt}\\
+    - zoom: float\\
+    - pan\_x, pan\_y\\
+    - fragments: List\\
+    - fragment\_cache\\
+    \rule{2.2cm}{0.4pt}\\
+    + paintEvent()\\
+    + mousePressEvent()\\
+    + render\_fragment()
+};
+
+\node (pointmgr) [process, text width=2.2cm] at (0,0) {
+    \textbf{PointManager}\\
+    \rule{2.2cm}{0.4pt}\\
+    - points: Dict\\
+    - fragment\_points\\
+    \rule{2.2cm}{0.4pt}\\
+    + add\_point()\\
+    + get\_matching\_labels()\\
+    + stitch\_by\_labels()
+};
+
+\node (loader) [process, text width=2.2cm] at (4,0) {
+    \textbf{ImageLoader}\\
+    \rule{2.2cm}{0.4pt}\\
+    - supported\_formats\\
+    \rule{2.2cm}{0.4pt}\\
+    + load\_image()\\
+    + get\_pyramid\_info()\\
+    + is\_pyramidal()
+};
+
+\node (exporter) [process, text width=2.2cm] at (8,0) {
+    \textbf{PyramidalExporter}\\
+    \rule{2.2cm}{0.4pt}\\
+    - level\_images\\
+    - compression\_settings\\
+    \rule{2.2cm}{0.4pt}\\
+    + export\_pyramidal()\\
+    + create\_composite()\\
+    + save\_metadata()
+};
+
+% Relations
+\draw [arrow] (fragmgr) -- (fragment);
+\draw [arrow] (canvas) -- (fragmgr);
+\draw [arrow] (loader) -- (fragment);
+\draw [arrow] (exporter) -- (fragmgr);
+\draw [arrow] (pointmgr) -- (fragmgr);
+\draw [arrow] (canvas) -- (pointmgr);
+
+% Labels des relations
+\node at (2,3.2) {\tiny manages};
+\node at (6,3.2) {\tiny displays};
+\node at (2,1.5) {\tiny creates};
+\node at (6,1.5) {\tiny exports};
+\node at (1,1.5) {\tiny coordinates};
+\node at (6,0.5) {\tiny renders};
+
+\end{tikzpicture}
+\caption{Diagramme de classes détaillé avec relations et responsabilités}
+\end{figure}
+
+\textbf{Classe Fragment} : Encapsule toutes les données et métadonnées d'un fragment d'image. Elle maintient l'image originale, l'image transformée mise en cache, et tous les paramètres de transformation (position, rotation, retournements). La méthode \texttt{get\_transformed()} applique les transformations géométriques en utilisant OpenCV pour les rotations et NumPy pour les retournements, avec gestion intelligente du cache pour optimiser les performances.
+
+\textbf{Classe FragmentManager} : Gestionnaire central qui coordonne toutes les opérations sur les fragments. Il implémente le pattern Observer via les signaux PyQt6 pour notifier automatiquement l'interface des changements d'état. Les méthodes de transformation (rotation, translation, retournement) appliquent les opérations géométriques tout en maintenant la cohérence des données et en invalidant les caches appropriés.
+
+\textbf{Classe CanvasWidget} : Widget de visualisation haute performance qui utilise les capacités de rendu accéléré de Qt. Il implémente plusieurs optimisations critiques : culling frustum pour ne rendre que les fragments visibles, gestion des niveaux de détail (LOD) selon le zoom, et mise en cache des textures transformées. Le rendu utilise des coordonnées flottantes pour maintenir la précision sub-pixellique.
+
+\subsubsection{Interface utilisateur et ergonomie}
+
+L'interface utilisateur a été conçue spécifiquement pour les besoins de l'anatomopathologie, avec un thème sombre qui réduit la fatigue oculaire lors de longues sessions d'analyse. L'organisation spatiale optimise l'efficacité du workflow en regroupant les outils par fonction.
+
+% Interface principale avec zones fonctionnelles
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/interface_principale_screenshot.png}
+\caption{Interface principale avec zones fonctionnelles optimisées pour l'anatomopathologie}
+\label{fig:interface_principale}
+\end{figure}
+
+\textbf{Zone de visualisation} : Le canvas central occupe la majeure partie de l'interface et permet la visualisation et manipulation directe des fragments. Il supporte la navigation fluide (zoom jusqu'à 5000\%, panoramique sans latence) et affiche les fragments avec leur transparence préservée. Les transformations sont appliquées en temps réel avec retour visuel immédiat.
+
+\textbf{Panneau de contrôle} : Organisé en onglets pour séparer les opérations sur fragments individuels et les opérations de groupe. Chaque contrôle fournit un retour visuel de l'état actuel et permet des ajustements précis (rotation au degré près, déplacement au pixel près).
+
+% Canvas avec fragments chargés - Démonstration de la visualisation
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{images/canvas_fragments_screenshot.png}
-\caption{Visualisation des fragments sur le canvas principal}
+\caption{Canvas de visualisation avec fragments tissulaires chargés et transparence préservée}
+\label{fig:canvas_fragments}
 \end{figure}
 
-\subsubsection{Fonctionnalités de manipulation}
+\subsubsection{Fonctionnalités avancées de manipulation}
 
-L'application offre des outils complets de manipulation individuelle et de groupe :
+\textbf{Sélection et manipulation de groupe} : L'outil de sélection rectangle permet de sélectionner et manipuler plusieurs fragments simultanément. Cette fonctionnalité est essentielle pour repositionner efficacement des groupes de fragments connexes. La rotation de groupe s'effectue autour du centroïde géométrique calculé automatiquement, préservant les positions relatives des fragments.
 
-% Sélection de groupe - placée ici car elle illustre directement la manipulation
+% Outils de sélection de groupe - Illustration des fonctionnalités avancées
 \begin{figure}[H]
 \centering
 \begin{subfigure}{0.48\textwidth}
 \includegraphics[width=\textwidth]{images/selection_rectangle_screenshot.png}
-\caption{Sélection rectangle multiple}
+\caption{Sélection rectangle pour groupes de fragments}
 \end{subfigure}
 \hfill
 \begin{subfigure}{0.48\textwidth}
 \includegraphics[width=\textwidth]{images/panneau_groupe_screenshot.png}
-\caption{Contrôles de groupe}
+\caption{Panneau de contrôle spécialisé pour manipulation de groupe}
 \end{subfigure}
-\caption{Outils de sélection et manipulation de groupe}
+\caption{Système de sélection et manipulation de groupe avec contrôles dédiés}
+\label{fig:selection_groupe}
 \end{figure}
 
-Le système de points étiquetés permet un alignement précis basé sur des correspondances anatomiques définies manuellement :
+\textbf{Système de points étiquetés} : Cette fonctionnalité constitue une innovation majeure de notre solution. Elle permet de placer des points de repère avec des étiquettes personnalisées sur les fragments. Les points portant la même étiquette sur différents fragments sont considérés comme correspondants, permettant un alignement automatique basé sur des repères anatomiques précis définis par l'utilisateur.
 
-% Points étiquetés - placée ici car elle illustre cette fonctionnalité spécifique
+% Points étiquetés pour alignement - Innovation technique principale
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{images/points_etiquetes_screenshot.png}
-\caption{Points étiquetés pour correspondances entre fragments}
+\includegraphics[width=0.9\textwidth]{images/points_etiquetes_screenshot.png}
+\caption{Système de points étiquetés permettant l'alignement précis basé sur des correspondances anatomiques}
+\label{fig:points_etiquetes}
 \end{figure}
 
-\subsubsection{Exportation pyramidale}
+\textbf{Algorithmes de suture} : Deux approches complémentaires ont été implémentées. La suture automatique utilise la détection de caractéristiques SIFT pour identifier des correspondances entre fragments, bien qu'elle soit limitée par l'absence de zones de chevauchement. La suture par points étiquetés, plus adaptée à notre contexte, utilise les correspondances définies manuellement pour calculer les transformations rigides optimales via des algorithmes de moindres carrés.
 
-L'exportation constitue l'étape finale permettant de générer les images reconstituées pour intégration dans le workflow TEP Margins :
+\subsubsection{Exportation pyramidale avancée}
 
-% Dialogues d'export - placés ici car ils illustrent directement l'exportation
+L'exportation constitue l'étape finale critique qui génère les images reconstituées pour intégration dans le workflow TEP Margins. Le système d'exportation offre un contrôle précis sur les formats et niveaux de résolution, répondant aux besoins variés des utilisateurs.
+
+% Système d'exportation - Interface de génération des résultats finaux
 \begin{figure}[H]
 \centering
 \begin{subfigure}{0.48\textwidth}
 \includegraphics[width=\textwidth]{images/dialogue_export_screenshot.png}
-\caption{Options d'exportation}
+\caption{Dialogue d'exportation avec choix de format}
 \end{subfigure}
 \hfill
 \begin{subfigure}{0.48\textwidth}
 \includegraphics[width=\textwidth]{images/selection_niveaux_screenshot.png}
-\caption{Sélection niveaux pyramidaux}
+\caption{Sélection précise des niveaux pyramidaux}
 \end{subfigure}
-\caption{Interface d'exportation avec contrôle des niveaux de résolution}
+\caption{Interface d'exportation pyramidale avec contrôle granulaire des paramètres}
+\label{fig:export_pyramidal}
 \end{figure}
 
-L'application propose deux formats principaux : PNG pour les aperçus rapides et TIFF pyramidal pour l'analyse approfondie avec préservation de la structure multi-résolution.
+\textbf{Export TIFF pyramidal} : L'exportation TIFF pyramidal préserve la structure multi-résolution des images d'origine, permettant une navigation fluide dans les outils d'analyse ultérieurs. L'utilisateur peut sélectionner précisément quels niveaux de résolution exporter, optimisant la taille des fichiers selon l'usage prévu. Le processus utilise la bibliothèque tifffile pour générer des fichiers compatibles avec les standards de l'anatomopathologie numérique.
+
+\textbf{Gestion des métadonnées} : L'exportation préserve et enrichit les métadonnées d'origine (résolution, calibration, informations de scan) tout en ajoutant les informations de transformation appliquées. Ces métadonnées sont essentielles pour la traçabilité et la reproductibilité des analyses, particulièrement importantes dans le contexte clinique.
+
+\textbf{Optimisations de performance} : L'exportation d'images de très haute résolution nécessite des optimisations spécifiques. Le processus utilise un traitement par blocs pour éviter de saturer la mémoire, et implémente un système de progression détaillé pour informer l'utilisateur de l'avancement des opérations longues.

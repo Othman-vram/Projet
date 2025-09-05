@@ -1,0 +1,210 @@
+\subsection{Architecture générale du système}
+
+La solution développée s'articule autour de deux composants principaux : un pipeline de prétraitement et une application desktop de suture manuelle. Cette architecture modulaire permet une séparation claire des responsabilités et facilite la maintenance et l'évolution du système.
+
+% Schéma d'architecture générale - placé en premier pour donner la vue d'ensemble
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=2cm, every node/.style={scale=0.8}]
+
+% Phase 1
+\node (micro) [input] at (0,4) {Microscope\\Scanner};
+\node (raw) [data] at (3,4) {Image Brute\\SVS/MRXS};
+
+% Phase 2
+\node (preproc) [process] at (6,4) {Prétraitement\\Pipeline};
+\node (frags) [data] at (9,4) {Fragments\\TIFF RGBA};
+
+% Phase 3
+\node (app) [process] at (6,2) {Application\\Suture};
+\node (final) [output] at (9,2) {Image Finale\\Reconstituée};
+
+% Phase 4
+\node (analysis) [tool] at (6,0) {Analyse\\TEP Margins};
+\node (diag) [output] at (9,0) {Diagnostic\\Médical};
+
+% Flèches
+\draw [arrow] (micro) -- (raw);
+\draw [arrow] (raw) -- (preproc);
+\draw [arrow] (preproc) -- (frags);
+\draw [arrow] (frags) -- (app);
+\draw [arrow] (app) -- (final);
+\draw [arrow] (final) -- (analysis);
+\draw [arrow] (analysis) -- (diag);
+
+% Labels des phases
+\node[text width=1.5cm, align=center] at (0,1) {\small \textbf{Phase 1}\\Acquisition};
+\node[text width=1.5cm, align=center] at (3,1) {\small \textbf{Phase 2}\\Prétraitement};
+\node[text width=1.5cm, align=center] at (6,1) {\small \textbf{Phase 3}\\Suture};
+\node[text width=1.5cm, align=center] at (9,1) {\small \textbf{Phase 4}\\Application};
+
+\end{tikzpicture}
+\caption{Flux de données global du système développé}
+\end{figure}
+
+\subsubsection{Module de prétraitement}
+
+Le pipeline transforme les images SVS/MRXS en fragments TIFF pyramidaux exploitables. Il utilise QuPath avec le plugin SAM pour la segmentation assistée, puis génère automatiquement les fichiers RGBA avec fond transparent.
+
+% Schéma d'architecture du prétraitement - placé logiquement après l'explication
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={scale=0.7}]
+
+% Ligne 1 - Entrées
+\node (svs) [input] at (0,4) {Image\\SVS/MRXS};
+\node (qupath) [tool] at (4,4) {QuPath\\+ SAM};
+\node (geojson) [data] at (8,4) {Masque\\GeoJSON};
+
+% Ligne 2 - Pipeline
+\node (pipeline) [process] at (4,2) {Pipeline Python\\unified\_tissue\_pipeline.py};
+
+% Ligne 3 - Processus
+\node (conversion) [process] at (0,0) {Conversion\\SVS → TIFF};
+\node (maskgen) [process] at (4,0) {Génération\\Masque};
+\node (extraction) [process] at (8,0) {Extraction\\RGBA};
+
+% Ligne 4 - Sortie
+\node (tiffout) [output] at (4,-2) {TIFF Pyramidal\\RGBA Prétraité};
+
+% Flèches
+\draw [arrow] (svs) -- (qupath);
+\draw [arrow] (qupath) -- (geojson);
+\draw [arrow] (svs) -- (pipeline);
+\draw [arrow] (geojson) -- (pipeline);
+\draw [arrow] (pipeline) -- (conversion);
+\draw [arrow] (pipeline) -- (maskgen);
+\draw [arrow] (pipeline) -- (extraction);
+\draw [arrow] (conversion) -- (maskgen);
+\draw [arrow] (maskgen) -- (extraction);
+\draw [arrow] (extraction) -- (tiffout);
+
+\end{tikzpicture}
+\caption{Architecture de la phase de prétraitement}
+\end{figure}
+
+% Interface QuPath - placée ici car elle illustre directement la segmentation
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/qupath_sam_segmentation_screenshot.png}
+\caption{Interface QuPath avec plugin SAM pour la segmentation des tissus}
+\end{figure}
+
+% Pipeline en exécution - placée ici car elle montre le processus automatisé
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/pipeline_execution_screenshot.png}
+\caption{Exécution du pipeline de prétraitement avec barres de progression}
+\end{figure}
+
+\subsubsection{Module de suture interactive}
+
+L'application desktop suit une architecture MVC avec PyQt6, permettant la manipulation manuelle des fragments prétraités pour reconstituer l'image histologique complète.
+
+% Architecture MVC - placée avant l'interface pour expliquer la structure
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=1.5cm, every node/.style={scale=0.7}]
+
+% Entrée
+\node (input) [input] at (4,6) {Fragments TIFF\\Pyramidaux};
+
+% Chargement
+\node (loader) [process] at (4,4.5) {Image Loader\\OpenSlide + tifffile};
+
+% Couche Modèle
+\node (fragmgr) [process] at (0,3) {Fragment\\Manager};
+\node (pointmgr) [process] at (0,1.5) {Point\\Manager};
+
+% Couche Vue
+\node (mainwin) [process] at (4,3) {Main\\Window};
+\node (canvas) [process] at (4,1.5) {Canvas\\Widget};
+
+% Couche Contrôleur
+\node (algo) [process] at (8,3) {Algorithmes\\Suture};
+\node (export) [process] at (8,1.5) {Export\\Manager};
+
+% Sortie
+\node (output) [output] at (4,0) {Image Finale\\TIFF Pyramidal};
+
+% Flèches
+\draw [arrow] (input) -- (loader);
+\draw [arrow] (loader) -- (mainwin);
+\draw [arrow] (fragmgr) -- (mainwin);
+\draw [arrow] (pointmgr) -- (mainwin);
+\draw [arrow] (mainwin) -- (canvas);
+\draw [arrow] (algo) -- (mainwin);
+\draw [arrow] (export) -- (mainwin);
+\draw [arrow] (export) -- (output);
+
+% Labels
+\node[processcolor] at (0,3.8) {\small \textbf{Modèle}};
+\node[toolcolor] at (4,3.8) {\small \textbf{Vue}};
+\node[outputcolor] at (8,3.8) {\small \textbf{Contrôleur}};
+
+\end{tikzpicture}
+\caption{Architecture MVC de l'application de suture}
+\end{figure}
+
+% Interface principale - placée après l'architecture pour montrer le résultat concret
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/interface_principale_screenshot.png}
+\caption{Interface principale avec zones fonctionnelles}
+\end{figure}
+
+% Canvas avec fragments - illustre la visualisation des données
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/canvas_fragments_screenshot.png}
+\caption{Visualisation des fragments sur le canvas principal}
+\end{figure}
+
+\subsubsection{Fonctionnalités de manipulation}
+
+L'application offre des outils complets de manipulation individuelle et de groupe :
+
+% Sélection de groupe - placée ici car elle illustre directement la manipulation
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\includegraphics[width=\textwidth]{images/selection_rectangle_screenshot.png}
+\caption{Sélection rectangle multiple}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\includegraphics[width=\textwidth]{images/panneau_groupe_screenshot.png}
+\caption{Contrôles de groupe}
+\end{subfigure}
+\caption{Outils de sélection et manipulation de groupe}
+\end{figure}
+
+Le système de points étiquetés permet un alignement précis basé sur des correspondances anatomiques définies manuellement :
+
+% Points étiquetés - placée ici car elle illustre cette fonctionnalité spécifique
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/points_etiquetes_screenshot.png}
+\caption{Points étiquetés pour correspondances entre fragments}
+\end{figure}
+
+\subsubsection{Exportation pyramidale}
+
+L'exportation constitue l'étape finale permettant de générer les images reconstituées pour intégration dans le workflow TEP Margins :
+
+% Dialogues d'export - placés ici car ils illustrent directement l'exportation
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\includegraphics[width=\textwidth]{images/dialogue_export_screenshot.png}
+\caption{Options d'exportation}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\includegraphics[width=\textwidth]{images/selection_niveaux_screenshot.png}
+\caption{Sélection niveaux pyramidaux}
+\end{subfigure}
+\caption{Interface d'exportation avec contrôle des niveaux de résolution}
+\end{figure}
+
+L'application propose deux formats principaux : PNG pour les aperçus rapides et TIFF pyramidal pour l'analyse approfondie avec préservation de la structure multi-résolution.

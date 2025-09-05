@@ -300,7 +300,7 @@ C'est dans ce contexte que s'inscrit mon stage : le développement d'un \textbf{
 
 \vspace{1em}
 
-\begin{}
+\begin{center}
 \textbf{\large Glossaire des termes techniques utilisés}
 \end{center}
 \vspace{1em}
@@ -852,10 +852,6 @@ Face aux limitations identifiées dans toutes les solutions existantes, le déve
 
 \end{tcolorbox}
 
-\subsection{Architecture générale du système}
-
-La solution développée s'articule autour de deux composants principaux : un pipeline de prétraitement et une application desktop de suture manuelle. Cette architecture modulaire permet une séparation claire des responsabilités et facilite la maintenance et l'évolution du système.
-
 % Schéma d'architecture générale
 \begin{figure}[H]
 \centering
@@ -895,6 +891,10 @@ La solution développée s'articule autour de deux composants principaux : un pi
 \end{tikzpicture}
 \caption{Flux de données global du système}
 \end{figure}
+
+\subsection{Architecture générale du système}
+
+La solution développée s'articule autour de deux composants principaux : un pipeline de prétraitement et une application desktop de suture manuelle. Cette architecture modulaire permet une séparation claire des responsabilités et facilite la maintenance et l'évolution du système.
 
 \subsubsection{Concepts fondamentaux}
 
@@ -1153,115 +1153,15 @@ L'application desktop est développée en Python avec le framework PyQt6, qui fo
 
 \textbf{Point Manager} : Le gestionnaire de points étiquetés permet de placer des repères sur les fragments pour faciliter l'alignement manuel. Ces points sont stockés en coordonnées locales relatives à chaque fragment, garantissant leur cohérence lors des transformations.
 
-\textbf{Export Manager} : Le gestionnaire d'exportation prend en charge la génération des images finales. Il supporte deux modes d'exportation :
-\begin{itemize}
-\item Export PNG pour les aperçus rapides
-\item Export TIFF pyramidal pour l'intégration dans les workflows d'analyse
-\end{itemize}
+\section{Explications des termes scientifiques et techniques}
 
-\section{Mise en œuvre}
+\subsection{Anatomopathologie numérique}
 
-\vspace{0.5em}
+\textbf{Anatomopathologie} : L'anatomopathologie est la spécialité médicale qui étudie les lésions macroscopiques et microscopiques des organes et tissus prélevés sur le patient. Elle constitue un élément essentiel du diagnostic médical, particulièrement en oncologie.
 
-\subsection{Environnement de développement et technologies}
+\textbf{Numérisation des lames} : La numérisation consiste à convertir les lames histologiques physiques en images numériques haute résolution. Ce processus utilise des scanners spécialisés capables de capturer des images à des résolutions sub-micrométriques.
 
-\vspace{1em}
-\begin{center}
-\textbf{\large Stack technologique utilisée}
-\end{center}
-\vspace{0.5em}
-
-\subsubsection{Stack technologique}
-
-Le développement s'est appuyé sur un environnement technique moderne et robuste :
-
-\textbf{Langage de programmation} : Python 3.11 a été choisi pour sa richesse écosystémique dans le domaine de l'imagerie scientifique et sa facilité de déploiement. Python offre également une excellente intégration avec les bibliothèques C/C++ performantes via des bindings natifs.
-
-\textbf{Framework d'interface} : PyQt6 pour l'interface graphique native et performante, offrant :
-\begin{itemize}
-\item Rendu accéléré par GPU pour les images haute résolution
-\item Système d'événements robuste pour les interactions utilisateur
-\item Support natif du multi-threading pour les opérations asynchrones
-\item Widgets spécialisés pour l'affichage d'images scientifiques
-\end{itemize}
-
-\textbf{Bibliothèques de traitement d'images} :
-\begin{itemize}
-\item \textbf{OpenSlide-Python} : Interface Python pour OpenSlide, lecture des formats propriétaires
-\item \textbf{PyVIPS} : Interface Python pour VIPS, traitement haute performance
-\item \textbf{OpenCV} : Algorithmes de vision par ordinateur et transformations géométriques
-\item \textbf{tifffile} : Lecture/écriture optimisée de fichiers TIFF pyramidaux
-\item \textbf{NumPy/SciPy} : Calculs numériques optimisés et algorithmes scientifiques
-\end{itemize}
-
-\subsubsection{Architecture modulaire}
-
-L'application suit une architecture modulaire stricte avec séparation claire des responsabilités :
-
-\textbf{Couche Modèle (src/core/)} :
-\begin{itemize}
-\item \texttt{Fragment} : Structure de données pour les fragments d'images
-\item \texttt{FragmentManager} : Gestionnaire central des fragments et transformations
-\item \texttt{PointManager} : Gestion des points étiquetés pour l'alignement
-\item \texttt{ImageLoader} : Chargement optimisé des différents formats d'images
-\end{itemize}
-
-\textbf{Couche Vue (src/ui/)} :
-\begin{itemize}
-\item \texttt{MainWindow} : Fenêtre principale et coordination des composants
-\item \texttt{CanvasWidget} : Widget de visualisation haute performance
-\item \texttt{ControlPanel} : Panneau de contrôle des transformations
-\item \texttt{FragmentList} : Liste interactive des fragments chargés
-\end{itemize}
-
-\textbf{Couche Utilitaires (src/utils/)} :
-\begin{itemize}
-\item \texttt{ExportManager} : Gestion des exportations PNG et métadonnées
-\item \texttt{PyramidalExporter} : Exportation TIFF pyramidal optimisée
-\end{itemize}
-
-\textbf{Couche Algorithmes (src/algorithms/)} :
-\begin{itemize}
-\item \texttt{RigidStitching} : Algorithmes de suture automatique par caractéristiques
-\end{itemize}
-
-\subsection{Fonctionnalités principales implémentées}
-
-\subsubsection{Chargement et visualisation des fragments}
-
-L'application supporte le chargement de multiples fragments TIFF pyramidaux avec gestion optimisée de la mémoire. Le système de visualisation utilise des techniques avancées :
-
-\textbf{Gestion des niveaux de détail (LOD)} : Pour maintenir des performances acceptables avec des images de très haute résolution, l'application implémente un système de niveaux de détail adaptatif. Selon le niveau de zoom, différentes résolutions sont chargées :
-\begin{itemize}
-\item Zoom < 25\% : Résolution 1/4
-\item Zoom < 50\% : Résolution 1/2  
-\item Zoom ≥ 50\% : Résolution complète
-\end{itemize}
-
-\textbf{Mise en cache intelligente} : Un système de cache multi-niveaux optimise l'utilisation de la mémoire :
-\begin{itemize}
-\item Cache de textures pour l'affichage
-\item Cache de fragments transformés en mémoire
-\item Invalidation automatique lors des modifications
-\end{itemize}
-
-\subsubsection{Manipulation des fragments}
-
-L'interface offre des outils complets de manipulation :
-
-\textbf{Transformations géométriques} :
-\begin{itemize}
-\item \textbf{Translation} : Déplacement par glisser-déposer ou contrôles précis
-\item \textbf{Rotation} : Rotation libre (0-360°) ou par pas de 90°
-\item \textbf{Retournement} : Miroir horizontal et vertical
-\item \textbf{Composition} : Combinaison de transformations avec préservation de la précision
-\end{itemize}
-
-\textbf{Sélection avancée} : L'application propose deux modes de sélection :
-\begin{itemize}
-\item \textbf{Sélection simple} : Clic sur un fragment pour sélection individuelle
-\item \textbf{Sélection rectangle} : Outil de sélection multiple par zone rectangulaire
-\end{itemize}
+\textbf{Lames fragmentées} : Lors de la préparation histologique, les tissus peuvent se fragmenter naturellement ou être découpés intentionnellement. Ces fragments doivent être reconstitués numériquement pour permettre une analyse complète.
 
 % CAPTURE D'ÉCRAN : Sélection rectangle et panneau groupe
 \begin{figure}[H]
@@ -1279,15 +1179,13 @@ L'interface offre des outils complets de manipulation :
 \label{fig:selection_groupe}
 \end{figure}
 
-\subsubsection{Points étiquetés pour alignement précis}
+\subsection{Formats d'images médicales}
 
-Le système de points étiquetés facilite l'alignement manuel précis entre fragments :
+\textbf{Format SVS (Aperio)} : SVS est un format propriétaire développé par Aperio (maintenant Leica Biosystems) pour stocker des images de lames entières. Il utilise une structure pyramidale avec compression JPEG et métadonnées TIFF.
 
-\textbf{Ajout de points} : L'utilisateur peut placer des points de repère sur les fragments avec des étiquettes personnalisées. Ces points sont stockés en coordonnées locales relatives à chaque fragment.
+\textbf{Format MRXS (3DHistech)} : MRXS est le format propriétaire de 3DHistech pour leurs scanners Pannoramic. Il stocke les images dans une structure de fichiers multiples avec indexation XML.
 
-\textbf{Correspondances} : Les points portant la même étiquette sur différents fragments sont considérés comme correspondants, permettant un alignement basé sur des repères anatomiques précis.
-
-\textbf{Suture par étiquettes} : Un algorithme dédié utilise les correspondances de points pour calculer automatiquement les transformations d'alignement optimales.
+\textbf{Format TIFF pyramidal} : Extension du format TIFF standard qui stocke multiple résolutions de la même image dans un seul fichier. Chaque niveau de la pyramide correspond à une résolution différente, permettant une navigation efficace à différents niveaux de zoom.
 
 % CAPTURE D'ÉCRAN : Points étiquetés
 \begin{figure}[H]
@@ -1297,17 +1195,15 @@ Le système de points étiquetés facilite l'alignement manuel précis entre fra
 \label{fig:points_etiquetes}
 \end{figure}
 
-\subsubsection{Exportation pyramidale avancée}
+\subsection{Algorithmes de traitement d'images}
 
-L'exportation constitue une fonctionnalité critique permettant de générer les images finales pour intégration dans le workflow TEP Margins :
+\textbf{Segmentation d'images} : Processus qui consiste à partitionner une image en régions homogènes selon des critères spécifiques (couleur, texture, intensité). En anatomopathologie, elle permet de séparer les structures tissulaires du fond de la lame.
 
-\textbf{Formats supportés} :
-\begin{itemize}
-\item \textbf{PNG} : Export rapide pour aperçus et présentations
-\item \textbf{TIFF pyramidal} : Export multi-résolution pour analyse approfondie
-\end{itemize}
+\textbf{Transformations géométriques} : Opérations mathématiques qui modifient la position, l'orientation ou la taille des objets dans une image. Les transformations rigides (translation, rotation) préservent les distances et les angles.
 
-\textbf{Sélection des niveaux pyramidaux} : L'utilisateur peut choisir précisément quels niveaux de résolution exporter, optimisant ainsi la taille des fichiers selon l'usage prévu.
+\textbf{Alpha blending} : Technique de composition d'images qui combine plusieurs images en utilisant un canal alpha pour définir la transparence. Cette technique est essentielle pour superposer des fragments avec des zones transparentes.
+
+\textbf{Détection de caractéristiques} : Algorithmes qui identifient des points d'intérêt distinctifs dans les images. SIFT (Scale-Invariant Feature Transform) est un algorithme classique qui détecte des points robustes aux changements d'échelle et de rotation.
 
 % CAPTURE D'ÉCRAN : Dialogue d'export et sélection niveaux
 \begin{figure}[H]
@@ -1324,427 +1220,6 @@ L'exportation constitue une fonctionnalité critique permettant de générer les
 \caption{Système d'exportation pyramidale}
 \label{fig:export_pyramidal}
 \end{figure}
-
-\subsection{Implémentation technique détaillée}
-
-\subsubsection{Gestion des performances}
-
-Plusieurs stratégies d'optimisation ont été implémentées pour maintenir des performances acceptables :
-
-\textbf{Rendu différé} : Les opérations de rendu coûteuses sont exécutées de manière asynchrone pour maintenir la réactivité de l'interface utilisateur.
-
-\textbf{Culling frustum} : Seuls les fragments visibles dans la zone d'affichage sont rendus, réduisant significativement la charge de calcul.
-
-\textbf{Chargement paresseux} : Les images ne sont chargées en mémoire qu'au moment de leur affichage, et seulement à la résolution nécessaire.
-
-\subsubsection{Algorithmes de transformation}
-
-Les transformations géométriques utilisent une approche matricielle pour préserver la précision :
-
-\textbf{Matrices de transformation} : Chaque fragment maintient une matrice de transformation 2D qui compose toutes les opérations (translation, rotation, retournement).
-
-\textbf{Interpolation bilinéaire} : Les rotations utilisent une interpolation bilinéaire pour préserver la qualité d'image.
-
-\textbf{Gestion de l'alpha} : Les transformations préservent le canal alpha pour maintenir la transparence des zones non-tissulaires.
-
-\subsubsection{Code source représentatif}
-
-Voici un extrait du code principal illustrant l'architecture de l'application :
-
-\begin{lstlisting}[language=Python, caption=Gestionnaire de fragments - Classe principale]
-class FragmentManager(QObject):
-    """Manages all tissue fragments and their transformations"""
-    
-    fragments_changed = pyqtSignal()
-    fragment_selected = pyqtSignal(str)
-    group_selection_changed = pyqtSignal(list)
-    
-    def __init__(self):
-        super().__init__()
-        self._fragments: Dict[str, Fragment] = {}
-        self._selected_fragment_id: Optional[str] = None
-        self._selected_fragment_ids: List[str] = []
-    
-    def add_fragment_from_image(self, image_data: np.ndarray, 
-                               name: str, file_path: str = "") -> str:
-        """Add a new fragment from image data"""
-        fragment = Fragment(
-            name=name,
-            image_data=image_data,
-            file_path=file_path
-        )
-        
-        self._fragments[fragment.id] = fragment
-        
-        if len(self._fragments) == 1:
-            self.set_selected_fragment(fragment.id)
-            
-        self.fragments_changed.emit()
-        return fragment.id
-\end{lstlisting}
-
-\begin{lstlisting}[language=Python, caption=Canvas Widget - Rendu haute performance]
-class CanvasWidget(QWidget):
-    """Optimized canvas for tissue fragment display"""
-    
-    def paintEvent(self, event: QPaintEvent):
-        """Paint the canvas with optimized rendering"""
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing, False)
-        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, 
-                             self.zoom > 2.0)
-        
-        # Fill background
-        painter.fillRect(self.rect(), self.background_color)
-        
-        # Set up viewport transformation
-        painter.save()
-        painter.scale(self.zoom, self.zoom)
-        painter.translate(self.pan_x, self.pan_y)
-        
-        # Get visible area for culling
-        visible_rect = self.get_visible_world_rect()
-        
-        # Draw fragments with frustum culling
-        for fragment in self.fragments:
-            if not fragment.visible:
-                continue
-            
-            if not self.fragment_intersects_rect(fragment, visible_rect):
-                continue
-                
-            self.draw_fragment(painter, fragment)
-        
-        painter.restore()
-\end{lstlisting}
-
-\begin{lstlisting}[language=Python, caption=Exportation pyramidale - Gestion multi-niveaux]
-def export_pyramidal_tiff(self, fragments: List[Fragment], 
-                         output_path: str, selected_levels: List[int],
-                         compression: str = "LZW") -> bool:
-    """Export fragments as stitched pyramidal TIFF"""
-    
-    level_images = {}
-    
-    for level in selected_levels:
-        # Create composite for this level
-        composite = self._create_level_composite(
-            fragments, level, pyramid_info
-        )
-        if composite is not None:
-            level_images[level] = composite
-    
-    # Save as pyramidal TIFF
-    return self._save_pyramidal_tiff(
-        level_images, output_path, compression
-    )
-\end{lstlisting}
-
-\section{Résultats obtenus et analyse critique}
-
-\clearpage
-
-\vspace{0.5em}
-
-\subsection{Fonctionnalités réalisées et validation}
-
-\subsubsection{Pipeline de prétraitement}
-
-Le pipeline de prétraitement a été entièrement implémenté et testé avec succès sur des données réelles fournies par le Centre Henri Becquerel :
-
-\textbf{Support des formats} : Lecture complète des formats SVS et MRXS avec préservation de la structure pyramidale. Tests réalisés sur des fichiers de 500 MB à 8 GB.
-
-\textbf{Segmentation assistée} : Intégration réussie avec QuPath et le plugin SAM pour une segmentation précise et efficace. Réduction du temps de segmentation de 75\% par rapport à la segmentation manuelle.
-
-\textbf{Génération TIFF} : Production de fichiers TIFF pyramidaux optimisés avec compression LZW et métadonnées préservées. Taux de compression moyen de 3:1 sans perte de qualité.
-
-\textbf{Performance} : Traitement d'une image de 2 GB en moins de 5 minutes sur une configuration standard (16 GB RAM, SSD).
-
-\subsubsection{Application de suture}
-
-L'application desktop offre toutes les fonctionnalités essentielles identifiées dans le cahier des charges :
-
-\textbf{Interface utilisateur} : Interface intuitive avec panneau de contrôle, liste des fragments, et canvas de visualisation haute performance. Temps d'apprentissage réduit à 15 minutes pour les utilisateurs finaux.
-
-\textbf{Manipulation des fragments} : Déplacement, rotation (libre et par pas de 90°), retournement, et ajustement d'opacité en temps réel. Précision sub-pixellique maintenue pour toutes les transformations.
-
-\textbf{Visualisation} : Navigation fluide avec zoom jusqu'à 5000\% et panoramique sans latence perceptible. Support d'images jusqu'à 50 000 × 50 000 pixels.
-
-\textbf{Points étiquetés} : Système de points de repère pour faciliter l'alignement manuel précis. Support de correspondances multiples entre fragments.
-
-\textbf{Sélection de groupe} : Manipulation simultanée de plusieurs fragments avec préservation des positions relatives. Rotation de groupe autour du centroïde calculé automatiquement.
-
-\textbf{Exportation} : Export PNG pour aperçus et TIFF pyramidal avec sélection des niveaux de résolution. Préservation complète de la qualité d'image.
-
-\subsection{Métriques de performance}
-
-\vspace{1em}
-\begin{center}
-\textbf{\large Performances mesurées du système}
-\end{center}
-\vspace{0.5em}
-
-\subsubsection{Performance de l'interface}
-
-Les tests de performance ont démontré des résultats satisfaisants dépassant les objectifs initiaux :
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Métrique} & \textbf{Objectif} & \textbf{Résultat} & \textbf{Statut} \\
-\hline
-Temps de réponse & < 100 ms & < 50 ms & ✅ Dépassé \\
-\hline
-Fluidité d'affichage & 30 FPS & 60 FPS & ✅ Dépassé \\
-\hline
-Utilisation mémoire & < 16 GB & 8-12 GB & ✅ Respecté \\
-\hline
-Fragments simultanés & 10 & 15+ & ✅ Dépassé \\
-\hline
-Temps de chargement & < 10 s & 2-5 s & ✅ Dépassé \\
-\hline
-\end{tabular}
-\caption{Métriques de performance de l'interface utilisateur}
-\label{tab:performance_interface}
-\end{table}
-
-\subsubsection{Qualité de l'exportation}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|c|l|}
-\hline
-\textbf{Critère} & \textbf{Résultat} & \textbf{Validation} \\
-\hline
-Précision géométrique & < 1 pixel & Tests avec mires de calibration \\
-\hline
-Qualité d'image & 100\% & Comparaison pixel par pixel \\
-\hline
-Intégrité métadonnées & Complète & Vérification automatisée \\
-\hline
-Compatibilité formats & SVS/MRXS/TIFF & Tests multi-constructeurs \\
-\hline
-\end{tabular}
-\caption{Métriques de qualité d'exportation}
-\label{tab:qualite_export}
-\end{table}
-
-\subsection{Validation utilisateur}
-
-\vspace{1em}
-\begin{center}
-\textbf{\large Retours d'expérience des utilisateurs finaux}
-\end{center}
-\vspace{0.5em}
-
-\subsubsection{Tests d'acceptation}
-
-Les tests avec les utilisateurs finaux (anatomopathologistes et physiciens médicaux) ont révélé une satisfaction élevée :
-
-\textbf{Facilité d'utilisation} : Interface jugée intuitive après 15 minutes de formation. Score de satisfaction : 4.2/5.
-
-\textbf{Efficacité} : Réduction du temps d'assemblage de 60\% par rapport aux méthodes manuelles précédentes (de 45 minutes à 18 minutes en moyenne).
-
-\textbf{Précision} : Amélioration de la précision d'alignement grâce aux outils de zoom et aux points étiquetés. Erreur d'alignement réduite de 5 pixels à moins de 1 pixel.
-
-\subsubsection{Retours d'expérience}
-
-\textbf{Points forts identifiés} :
-\begin{itemize}
-\item Simplicité d'utilisation et courbe d'apprentissage réduite
-\item Performance satisfaisante même avec des images de très grande taille
-\item Qualité d'exportation adaptée aux besoins cliniques
-\item Stabilité de l'application lors d'utilisations prolongées
-\end{itemize}
-
-\textbf{Axes d'amélioration identifiés} :
-\begin{itemize}
-\item Ajout d'un système d'annulation/rétablissement plus granulaire
-\item Amélioration des outils d'alignement automatique
-\item Support de formats d'image additionnels (CZI, LIF)
-\item Intégration avec les systèmes d'information hospitaliers
-\end{itemize}
-
-\subsection{Analyse critique}
-
-\subsubsection{Points forts de la solution}
-
-\textbf{Adaptation aux besoins spécifiques} : La solution développée répond précisément aux besoins identifiés dans le cahier des charges, sans fonctionnalités superflues qui pourraient complexifier l'utilisation.
-
-\textbf{Performance optimisée} : L'architecture développée permet de traiter efficacement des images de très haute résolution tout en maintenant une interface réactive. Les optimisations implémentées (LOD, cache, culling) garantissent une expérience utilisateur fluide.
-
-\textbf{Extensibilité} : L'architecture modulaire facilite l'ajout de nouvelles fonctionnalités et l'adaptation à de nouveaux besoins. La séparation claire des responsabilités permet une maintenance aisée.
-
-\textbf{Robustesse} : Les tests approfondis et la validation utilisateur garantissent la fiabilité de la solution en conditions réelles d'utilisation clinique.
-
-\subsubsection{Limitations identifiées}
-
-\textbf{Dépendance aux bibliothèques natives} : L'utilisation de bibliothèques C/C++ (OpenSlide, VIPS) complexifie le déploiement et la maintenance. Une containerisation Docker a été mise en place pour atténuer cette limitation.
-
-\textbf{Alignement manuel} : L'absence d'algorithmes d'alignement automatique robustes limite l'efficacité pour certains types de fragments. Cependant, cette limitation est compensée par la précision du contrôle manuel.
-
-\textbf{Formats supportés} : La solution se concentre actuellement sur les formats SVS et MRXS, mais l'écosystème de l'anatomopathologie numérique comprend d'autres formats propriétaires.
-
-\subsubsection{Perspectives d'évolution}
-
-\textbf{Intelligence artificielle} : L'intégration d'algorithmes d'apprentissage automatique pourrait considérablement améliorer l'efficacité de la segmentation et de l'alignement. Les récents progrès en vision par ordinateur offrent des perspectives intéressantes.
-
-\textbf{Collaboration en temps réel} : Le développement de fonctionnalités collaboratives permettrait à plusieurs anatomopathologistes de travailler simultanément sur la même reconstitution.
-
-\textbf{Intégration workflow} : Une meilleure intégration avec les systèmes d'information hospitaliers faciliterait l'adoption en routine clinique et améliorerait la traçabilité des analyses.
-
-\subsection{Impact et contribution}
-
-\subsubsection{Contribution au projet TEP Margins}
-
-L'outil développé s'intègre parfaitement dans le workflow du projet TEP Margins :
-
-\textbf{Amélioration de la qualité des données} : La reconstitution précise des lames fragmentées améliore la qualité des images histologiques utilisées pour la comparaison avec les données micro-TEP.
-
-\textbf{Standardisation du processus} : L'outil fournit une méthode reproductible et standardisée pour la reconstitution des lames, réduisant la variabilité inter-opérateur.
-
-\textbf{Gain de temps} : La réduction significative du temps de traitement permet d'accélérer le workflow global de l'étude clinique.
-
-\subsubsection{Contribution scientifique}
-
-Le travail réalisé contribue à l'avancement des pratiques en anatomopathologie numérique :
-
-\textbf{Méthodologie} : Développement d'une méthodologie reproductible pour la reconstitution de lames fragmentées.
-
-\textbf{Outils open-source} : Mise à disposition de la communauté scientifique d'un outil spécialisé et documenté.
-
-\textbf{Standards} : Contribution à l'établissement de bonnes pratiques pour la manipulation d'images histologiques haute résolution.
-
-\section{Mise en œuvre technique et organisationnelle}
-
-\clearpage
-
-\vspace{0.5em}
-
-\subsection{Environnement de développement}
-
-\subsubsection{Outils et technologies}
-
-Le développement s'est appuyé sur un environnement technique moderne et robuste :
-
-\textbf{Langage de programmation} : Python 3.11 a été choisi pour sa richesse écosystémique dans le domaine de l'imagerie scientifique et sa facilité de déploiement. Python offre également une excellente intégration avec les bibliothèques C/C++ performantes via des bindings natifs.
-
-\textbf{Gestionnaire de dépendances} : Conda a été utilisé pour gérer les dépendances complexes, notamment les bibliothèques nécessitant des composants natifs (OpenSlide, VIPS, OpenCV). Conda garantit la reproductibilité de l'environnement de développement et simplifie le déploiement.
-
-\textbf{Contrôle de version} : Git avec une stratégie de branching GitFlow pour organiser le développement en parallèle des deux composants principaux (prétraitement et application desktop).
-
-\textbf{IDE} : Visual Studio Code avec extensions Python pour le développement, le débogage et les tests.
-
-\subsubsection{Architecture des dépendances}
-
-Les dépendances principales incluent :
-
-\textbf{Traitement d'images} :
-\begin{itemize}
-\item OpenSlide-Python : Interface Python pour OpenSlide
-\item PyVIPS : Interface Python pour VIPS
-\item OpenCV : Bibliothèque de vision par ordinateur
-\item Pillow : Manipulation d'images Python
-\item tifffile : Lecture/écriture de fichiers TIFF
-\end{itemize}
-
-\textbf{Interface graphique} :
-\begin{itemize}
-\item PyQt6 : Framework d'interface graphique
-\item NumPy : Calculs numériques optimisés
-\item SciPy : Algorithmes scientifiques
-\end{itemize}
-
-\textbf{Formats de données} :
-\begin{itemize}
-\item Shapely : Manipulation de géométries
-\item JSON : Sérialisation des métadonnées
-\end{itemize}
-
-\subsection{Méthodologie de développement}
-
-\subsubsection{Approche itérative}
-
-Le développement a suivi une approche itérative avec des cycles courts de 2 semaines, permettant une validation régulière avec les utilisateurs finaux. Chaque itération comprenait :
-\begin{itemize}
-\item Analyse des besoins et spécification des fonctionnalités
-\item Développement et tests unitaires
-\item Intégration et tests d'acceptation
-\item Démonstration et recueil de feedback
-\end{itemize}
-
-\subsubsection{Tests et validation}
-
-Une stratégie de tests multi-niveaux a été mise en place :
-
-\textbf{Tests unitaires} : Validation des composants individuels (gestionnaires, algorithmes de transformation, fonctions utilitaires).
-
-\textbf{Tests d'intégration} : Validation des interactions entre composants (pipeline de prétraitement, chargement/sauvegarde, rendu).
-
-\textbf{Tests d'acceptation} : Validation avec des données réelles fournies par l'équipe d'anatomopathologie.
-
-\textbf{Tests de performance} : Mesure des temps de réponse et de l'utilisation mémoire avec des jeux de données de taille variable.
-
-\subsection{Défis techniques rencontrés}
-
-\subsubsection{Gestion de la mémoire}
-
-Le principal défi technique a été la gestion efficace de la mémoire avec des images de très haute résolution (jusqu'à plusieurs gigapixels). Plusieurs stratégies ont été implémentées :
-
-\textbf{Chargement paresseux} : Les images ne sont chargées en mémoire qu'au moment de leur affichage, et seulement à la résolution nécessaire.
-
-\textbf{Garbage collection optimisé} : Libération proactive de la mémoire lors des changements de contexte (zoom, navigation).
-
-\textbf{Streaming des données} : Pour les opérations d'exportation, les images sont traitées par blocs pour éviter de charger l'intégralité en mémoire.
-
-\subsubsection{Performance du rendu}
-
-L'affichage fluide de multiples fragments haute résolution a nécessité plusieurs optimisations :
-
-\textbf{Rendu multi-threadé} : Séparation du rendu des fragments du thread principal de l'interface utilisateur.
-
-\textbf{Culling frustum} : Seuls les fragments visibles dans la zone d'affichage sont rendus.
-
-\textbf{Mise en cache des transformations} : Les fragments transformés sont mis en cache pour éviter les recalculs répétés.
-
-\subsubsection{Précision des transformations}
-
-Maintenir la précision des transformations géométriques avec des coordonnées flottantes a nécessité une attention particulière :
-
-\textbf{Arithmétique en double précision} : Utilisation systématique de flottants 64 bits pour les calculs de position.
-
-\textbf{Accumulation des erreurs} : Implémentation de transformations composées pour éviter l'accumulation d'erreurs de précision.
-
-\textbf{Validation des transformations} : Vérification de la cohérence des transformations avant application.
-
-\section{Explications des termes scientifiques et techniques}
-
-\subsection{Anatomopathologie numérique}
-
-\textbf{Anatomopathologie} : L'anatomopathologie est la spécialité médicale qui étudie les lésions macroscopiques et microscopiques des organes et tissus prélevés sur le patient. Elle constitue un élément essentiel du diagnostic médical, particulièrement en oncologie.
-
-\textbf{Numérisation des lames} : La numérisation consiste à convertir les lames histologiques physiques en images numériques haute résolution. Ce processus utilise des scanners spécialisés capables de capturer des images à des résolutions sub-micrométriques.
-
-\textbf{Lames fragmentées} : Lors de la préparation histologique, les tissus peuvent se fragmenter naturellement ou être découpés intentionnellement. Ces fragments doivent être reconstitués numériquement pour permettre une analyse complète.
-
-\subsection{Formats d'images médicales}
-
-\textbf{Format SVS (Aperio)} : SVS est un format propriétaire développé par Aperio (maintenant Leica Biosystems) pour stocker des images de lames entières. Il utilise une structure pyramidale avec compression JPEG et métadonnées TIFF.
-
-\textbf{Format MRXS (3DHistech)} : MRXS est le format propriétaire de 3DHistech pour leurs scanners Pannoramic. Il stocke les images dans une structure de fichiers multiples avec indexation XML.
-
-\textbf{Format TIFF pyramidal} : Extension du format TIFF standard qui stocke multiple résolutions de la même image dans un seul fichier. Chaque niveau de la pyramide correspond à une résolution différente, permettant une navigation efficace à différents niveaux de zoom.
-
-\subsection{Algorithmes de traitement d'images}
-
-\textbf{Segmentation d'images} : Processus qui consiste à partitionner une image en régions homogènes selon des critères spécifiques (couleur, texture, intensité). En anatomopathologie, elle permet de séparer les structures tissulaires du fond de la lame.
-
-\textbf{Transformations géométriques} : Opérations mathématiques qui modifient la position, l'orientation ou la taille des objets dans une image. Les transformations rigides (translation, rotation) préservent les distances et les angles.
-
-\textbf{Alpha blending} : Technique de composition d'images qui combine plusieurs images en utilisant un canal alpha pour définir la transparence. Cette technique est essentielle pour superposer des fragments avec des zones transparentes.
-
-\textbf{Détection de caractéristiques} : Algorithmes qui identifient des points d'intérêt distinctifs dans les images. SIFT (Scale-Invariant Feature Transform) est un algorithme classique qui détecte des points robustes aux changements d'échelle et de rotation.
 
 \subsection{Architecture logicielle}
 

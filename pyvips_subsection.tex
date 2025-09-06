@@ -1,6 +1,6 @@
-\subsubsection{PyVIPS : Traitement d'images haute performance}
+\subsubsection{PyVIPS : Optimisation de l'exportation pyramidale}
 
-PyVIPS est une bibliothèque Python qui fournit des bindings pour VIPS (Vision Image Processing System), un système de traitement d'images conçu spécifiquement pour gérer efficacement les images de très grande taille. Dans le contexte de notre projet, PyVIPS joue un rôle crucial dans le pipeline de prétraitement pour la manipulation des images histologiques gigapixels.
+PyVIPS est une bibliothèque Python qui fournit des bindings pour VIPS (Vision Image Processing System), un système de traitement d'images conçu spécifiquement pour gérer efficacement les images de très grande taille. Dans le contexte de notre projet, PyVIPS joue un rôle crucial dans le système d'exportation pour la génération d'images TIFF pyramidales de haute qualité à partir des fragments assemblés.
 
 \textbf{Caractéristiques techniques de PyVIPS :}
 
@@ -11,15 +11,15 @@ PyVIPS est une bibliothèque Python qui fournit des bindings pour VIPS (Vision I
     \item \textbf{Optimisation mémoire} : Utilisation d'un cache intelligent et de techniques de pagination pour minimiser l'empreinte mémoire
 \end{itemize}
 
-\textbf{Intégration dans notre pipeline :}
+\textbf{Intégration dans notre système d'exportation :}
 
-Dans le module de prétraitement, PyVIPS est utilisé pour deux opérations critiques : la conversion des fichiers SVS propriétaires vers le format TIFF pyramidal standardisé, et la génération de masques pyramidaux à partir des annotations GeoJSON. Cette approche garantit que les structures pyramidales sont préservées tout au long du processus, permettant une navigation fluide dans l'application de suture finale.
+Dans le module d'exportation, PyVIPS est utilisé pour générer des images TIFF pyramidales composites à partir des fragments assemblés dans l'interface de suture. Le système d'exportation utilise PyVIPS pour créer efficacement les différents niveaux de résolution de l'image finale, en appliquant les transformations géométriques (rotation, translation, retournement) calculées par l'interface utilisateur. Cette approche garantit que la structure pyramidale est correctement générée avec préservation de la qualité d'image à tous les niveaux.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{images/pipeline_execution_screenshot.png}
-\caption{Interface d'exécution du pipeline PyVIPS avec barres de progression et sélection interactive des niveaux pyramidaux}
-\label{fig:pyvips_pipeline}
+\includegraphics[width=0.9\textwidth]{images/dialogue_export_screenshot.png}
+\caption{Interface d'exportation utilisant PyVIPS pour la génération de TIFF pyramidaux avec sélection des niveaux}
+\label{fig:pyvips_export}
 \end{figure}
 
 \textbf{Avantages décisifs pour notre projet :}
@@ -31,4 +31,4 @@ Dans le module de prétraitement, PyVIPS est utilisé pour deux opérations crit
     \item \textbf{Compatibilité} : Support natif des formats médicaux (SVS, MRXS) via OpenSlide
 \end{itemize}
 
-L'utilisation de PyVIPS dans notre pipeline de prétraitement permet de transformer efficacement les images brutes d'anatomopathologie en fragments TIFF pyramidaux RGBA prêts pour la manipulation dans l'interface de suture, tout en maintenant des performances acceptables sur les postes de travail cliniques standards.
+L'utilisation de PyVIPS dans notre système d'exportation permet de générer efficacement des images TIFF pyramidales composites de haute qualité à partir des fragments assemblés, tout en maintenant des performances acceptables lors de l'exportation d'images de plusieurs gigaoctets sur des postes de travail cliniques standards. Cette approche garantit que les images finales conservent leur structure multi-résolution, essentielle pour l'intégration dans le protocole TEP Margins.

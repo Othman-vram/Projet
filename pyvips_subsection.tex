@@ -1,0 +1,34 @@
+\subsubsection{PyVIPS : Traitement d'images haute performance}
+
+PyVIPS est une bibliothèque Python qui fournit des bindings pour VIPS (Vision Image Processing System), un système de traitement d'images conçu spécifiquement pour gérer efficacement les images de très grande taille. Dans le contexte de notre projet, PyVIPS joue un rôle crucial dans le pipeline de prétraitement pour la manipulation des images histologiques gigapixels.
+
+\textbf{Caractéristiques techniques de PyVIPS :}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Traitement par flux} : PyVIPS utilise une approche de traitement par flux (streaming) qui ne charge en mémoire que les portions d'image nécessaires au calcul en cours
+    \item \textbf{Gestion pyramidale native} : Support intégré des structures pyramidales TIFF avec accès optimisé aux différents niveaux de résolution
+    \item \textbf{Parallélisation automatique} : Exploitation automatique des processeurs multi-cœurs pour accélérer les opérations de traitement
+    \item \textbf{Optimisation mémoire} : Utilisation d'un cache intelligent et de techniques de pagination pour minimiser l'empreinte mémoire
+\end{itemize}
+
+\textbf{Intégration dans notre pipeline :}
+
+Dans le module de prétraitement, PyVIPS est utilisé pour deux opérations critiques : la conversion des fichiers SVS propriétaires vers le format TIFF pyramidal standardisé, et la génération de masques pyramidaux à partir des annotations GeoJSON. Cette approche garantit que les structures pyramidales sont préservées tout au long du processus, permettant une navigation fluide dans l'application de suture finale.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{images/pipeline_execution_screenshot.png}
+\caption{Interface d'exécution du pipeline PyVIPS avec barres de progression et sélection interactive des niveaux pyramidaux}
+\label{fig:pyvips_pipeline}
+\end{figure}
+
+\textbf{Avantages décisifs pour notre projet :}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Scalabilité} : Capacité à traiter des images de plusieurs gigaoctets sans saturation mémoire
+    \item \textbf{Performance} : Temps de traitement optimisés grâce à la parallélisation et au streaming
+    \item \textbf{Qualité} : Préservation de la qualité d'image et des métadonnées lors des conversions
+    \item \textbf{Compatibilité} : Support natif des formats médicaux (SVS, MRXS) via OpenSlide
+\end{itemize}
+
+L'utilisation de PyVIPS dans notre pipeline de prétraitement permet de transformer efficacement les images brutes d'anatomopathologie en fragments TIFF pyramidaux RGBA prêts pour la manipulation dans l'interface de suture, tout en maintenant des performances acceptables sur les postes de travail cliniques standards.
